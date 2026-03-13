@@ -256,6 +256,10 @@ body {
     background: var(--primary);
 }
 
+.product-badge.discount {
+    top: 3rem;
+}
+
 .product-colors {
     position: absolute;
     bottom: 1rem;

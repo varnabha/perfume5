@@ -17,8 +17,11 @@ class AppwriteDB {
             productsKey: 'cached_products',
             productPrefix: 'cached_product_',
             categoryCountsKey: 'cached_category_counts',
-            lastFetchKey: 'last_fetch_time'
+            lastFetchKey: 'last_fetch_time',
+            dataVersionKey: 'products_data_version'
         };
+
+        this.currentDataVersion = this.getDataVersion();
         
         // Initialize cache cleanup
         this.initCacheCleanup();
@@ -56,6 +59,35 @@ class AppwriteDB {
         } catch (error) {
             console.warn('Cache read error:', error);
             return null;
+        }
+    }
+
+    // Get current products data version
+    getDataVersion() {
+        try {
+            return localStorage.getItem(this.cacheConfig.dataVersionKey) || '0';
+        } catch (error) {
+            return '0';
+        }
+    }
+
+    // Bump version after data mutation, so other tabs/pages can refresh cache instantly
+    bumpDataVersion() {
+        const newVersion = Date.now().toString();
+        try {
+            localStorage.setItem(this.cacheConfig.dataVersionKey, newVersion);
+        } catch (error) {
+            console.warn('Data version update error:', error);
+        }
+        this.currentDataVersion = newVersion;
+    }
+
+    // Clear local cache if another tab/page mutated products
+    syncCacheVersion() {
+        const latestVersion = this.getDataVersion();
+        if (latestVersion !== this.currentDataVersion) {
+            this.clearProductsCache();
+            this.currentDataVersion = latestVersion;
         }
     }
     
@@ -226,6 +258,8 @@ class AppwriteDB {
     // Fetch all products with caching
     async getAllProducts(options = {}) {
         const { category, featured, limit = 100, offset = 0, forceRefresh = false } = options;
+
+        this.syncCacheVersion();
         
         // Generate cache key based on query parameters
         const cacheKey = `${this.cacheConfig.productsKey}_${category || 'all'}_${featured || 'false'}_${limit}_${offset}`;
@@ -310,14 +344,19 @@ class AppwriteDB {
     }
 
     // Fetch single product by ID with caching
-    async getProductById(id) {
+    async getProductById(id, options = {}) {
+        const { forceRefresh = false } = options;
         const cacheKey = `${this.cacheConfig.productPrefix}${id}`;
+
+        this.syncCacheVersion();
         
         // Check cache first
-        const cached = this.getFromCache(cacheKey);
-        if (cached) {
-            console.log('Returning cached product');
-            return cached;
+        if (!forceRefresh) {
+            const cached = this.getFromCache(cacheKey);
+            if (cached) {
+                console.log('Returning cached product');
+                return cached;
+            }
         }
         
         try {
@@ -357,21 +396,21 @@ class AppwriteDB {
     }
 
     // Fetch products by category
-    async getProductsByCategory(category) {
-        return this.getAllProducts({ category });
+    async getProductsByCategory(category, options = {}) {
+        return this.getAllProducts({ category, ...options });
     }
 
     // Fetch featured products
-    async getFeaturedProducts(limit = 6) {
-        return this.getAllProducts({ featured: true, limit });
+    async getFeaturedProducts(limit = 6, options = {}) {
+        return this.getAllProducts({ featured: true, limit, ...options });
     }
 
     // Search products
-    async searchProducts(query) {
+    async searchProducts(query, options = {}) {
         try {
             // Appwrite doesn't have full-text search, so we'll fetch all and filter
             // In production, you might want to use Appwrite's search or Algolia
-            const allProducts = await this.getAllProducts({ limit: 1000 });
+            const allProducts = await this.getAllProducts({ limit: 1000, ...options });
             
             const searchTerm = query.toLowerCase();
             return allProducts.filter(product => 
@@ -390,6 +429,38 @@ class AppwriteDB {
 
     // ===== Admin Operations =====
 
+    // Extract unknown attribute name from Appwrite validation errors
+    extractUnknownAttribute(errorMessage = '') {
+        const match = String(errorMessage).match(/Unknown attribute:\s*"([^"]+)"/i);
+        return match ? match[1] : null;
+    }
+
+    // Retry payload by dropping fields not present in current Appwrite collection schema
+    async executeWithSchemaRetry(requestFn, formattedData) {
+        let payload = { ...formattedData };
+        const maxRetries = 5;
+
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+            const response = await requestFn(payload);
+            if (response.ok) {
+                return response;
+            }
+
+            const errorData = await response.json().catch(() => ({}));
+            const message = errorData.message || `HTTP error! status: ${response.status}`;
+            const unknownAttr = this.extractUnknownAttribute(message);
+
+            if (!unknownAttr || !(unknownAttr in payload)) {
+                throw new Error(message);
+            }
+
+            console.warn(`Skipping unknown Appwrite attribute: ${unknownAttr}`);
+            delete payload[unknownAttr];
+        }
+
+        throw new Error('Could not process write request after removing unknown attributes.');
+    }
+
     // Add new product
     async addProduct(productData) {
         try {
@@ -398,24 +469,23 @@ class AppwriteDB {
             // Format data for Appwrite
             const formattedData = this.formatDataForAppwrite(productData);
             
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: this.getHeaders(true), // CRITICAL: Include API key
-                body: JSON.stringify({
-                    documentId: 'unique()',
-                    data: formattedData
-                })
-            });
-            
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-            }
+            const response = await this.executeWithSchemaRetry(
+                (payload) => fetch(url, {
+                    method: 'POST',
+                    headers: this.getHeaders(true), // CRITICAL: Include API key
+                    body: JSON.stringify({
+                        documentId: 'unique()',
+                        data: payload
+                    })
+                }),
+                formattedData
+            );
             
             const data = await response.json();
             
             // Clear products cache to ensure fresh data
             this.clearProductsCache();
+            this.bumpDataVersion();
             
             return this.formatDocument(data);
         } catch (error) {
@@ -432,18 +502,16 @@ class AppwriteDB {
             // Format data for Appwrite
             const formattedData = this.formatDataForAppwrite(productData);
             
-            const response = await fetch(url, {
-                method: 'PATCH',
-                headers: this.getHeaders(true), // CRITICAL: Include API key
-                body: JSON.stringify({
-                    data: formattedData
-                })
-            });
-            
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-            }
+            const response = await this.executeWithSchemaRetry(
+                (payload) => fetch(url, {
+                    method: 'PATCH',
+                    headers: this.getHeaders(true), // CRITICAL: Include API key
+                    body: JSON.stringify({
+                        data: payload
+                    })
+                }),
+                formattedData
+            );
             
             const data = await response.json();
             const product = this.formatDocument(data);
@@ -451,6 +519,7 @@ class AppwriteDB {
             // Update cache
             this.setCache(`${this.cacheConfig.productPrefix}${id}`, product);
             this.clearProductsCache();
+            this.bumpDataVersion();
             
             return product;
         } catch (error) {
@@ -476,6 +545,7 @@ class AppwriteDB {
             // Remove from cache
             this.removeFromCache(`${this.cacheConfig.productPrefix}${id}`);
             this.clearProductsCache();
+            this.bumpDataVersion();
             
             return true;
         } catch (error) {
@@ -542,12 +612,16 @@ class AppwriteDB {
     // ===== Statistics =====
 
     // Get product counts by category with caching
-    async getCategoryCounts() {
+    async getCategoryCounts(forceRefresh = false) {
+        this.syncCacheVersion();
+
         // Check cache first
-        const cached = this.getFromCache(this.cacheConfig.categoryCountsKey);
-        if (cached) {
-            console.log('Returning cached category counts');
-            return cached;
+        if (!forceRefresh) {
+            const cached = this.getFromCache(this.cacheConfig.categoryCountsKey);
+            if (cached) {
+                console.log('Returning cached category counts');
+                return cached;
+            }
         }
         
         try {
@@ -619,6 +693,9 @@ formatDocument(doc) {
         tags: doc.product_tags || [],
         featured: doc.featured || false,
         badge: doc.badge || '',
+        product_colour: doc.product_colour || '',
+        box: doc.box || 'without box',
+        box_price: doc.box_price || 0,
         created_date: doc.$createdAt || '',
         updated_date: doc.$updatedAt || ''
     };
@@ -646,6 +723,9 @@ formatDocument(doc) {
         if (data.product_tags !== undefined) formatted.product_tags = data.product_tags;
         if (data.featured !== undefined) formatted.featured = data.featured;
         if (data.badge !== undefined) formatted.badge = data.badge;
+        if (data.product_colour !== undefined) formatted.product_colour = data.product_colour;
+        if (data.box !== undefined) formatted.box = data.box;
+        if (data.box_price !== undefined) formatted.box_price = data.box_price;
         if (data.status !== undefined) formatted.status = data.status;
         
         return formatted;
