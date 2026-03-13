@@ -17,8 +17,11 @@ class AppwriteDB {
             productsKey: 'cached_products',
             productPrefix: 'cached_product_',
             categoryCountsKey: 'cached_category_counts',
-            lastFetchKey: 'last_fetch_time'
+            lastFetchKey: 'last_fetch_time',
+            dataVersionKey: 'products_data_version'
         };
+
+        this.currentDataVersion = this.getDataVersion();
         
         // Initialize cache cleanup
         this.initCacheCleanup();
@@ -56,6 +59,35 @@ class AppwriteDB {
         } catch (error) {
             console.warn('Cache read error:', error);
             return null;
+        }
+    }
+
+    // Get current products data version
+    getDataVersion() {
+        try {
+            return localStorage.getItem(this.cacheConfig.dataVersionKey) || '0';
+        } catch (error) {
+            return '0';
+        }
+    }
+
+    // Bump version after data mutation, so other tabs/pages can refresh cache instantly
+    bumpDataVersion() {
+        const newVersion = Date.now().toString();
+        try {
+            localStorage.setItem(this.cacheConfig.dataVersionKey, newVersion);
+        } catch (error) {
+            console.warn('Data version update error:', error);
+        }
+        this.currentDataVersion = newVersion;
+    }
+
+    // Clear local cache if another tab/page mutated products
+    syncCacheVersion() {
+        const latestVersion = this.getDataVersion();
+        if (latestVersion !== this.currentDataVersion) {
+            this.clearProductsCache();
+            this.currentDataVersion = latestVersion;
         }
     }
     
@@ -226,6 +258,8 @@ class AppwriteDB {
     // Fetch all products with caching
     async getAllProducts(options = {}) {
         const { category, featured, limit = 100, offset = 0, forceRefresh = false } = options;
+
+        this.syncCacheVersion();
         
         // Generate cache key based on query parameters
         const cacheKey = `${this.cacheConfig.productsKey}_${category || 'all'}_${featured || 'false'}_${limit}_${offset}`;
@@ -310,14 +344,19 @@ class AppwriteDB {
     }
 
     // Fetch single product by ID with caching
-    async getProductById(id) {
+    async getProductById(id, options = {}) {
+        const { forceRefresh = false } = options;
         const cacheKey = `${this.cacheConfig.productPrefix}${id}`;
+
+        this.syncCacheVersion();
         
         // Check cache first
-        const cached = this.getFromCache(cacheKey);
-        if (cached) {
-            console.log('Returning cached product');
-            return cached;
+        if (!forceRefresh) {
+            const cached = this.getFromCache(cacheKey);
+            if (cached) {
+                console.log('Returning cached product');
+                return cached;
+            }
         }
         
         try {
@@ -357,21 +396,21 @@ class AppwriteDB {
     }
 
     // Fetch products by category
-    async getProductsByCategory(category) {
-        return this.getAllProducts({ category });
+    async getProductsByCategory(category, options = {}) {
+        return this.getAllProducts({ category, ...options });
     }
 
     // Fetch featured products
-    async getFeaturedProducts(limit = 6) {
-        return this.getAllProducts({ featured: true, limit });
+    async getFeaturedProducts(limit = 6, options = {}) {
+        return this.getAllProducts({ featured: true, limit, ...options });
     }
 
     // Search products
-    async searchProducts(query) {
+    async searchProducts(query, options = {}) {
         try {
             // Appwrite doesn't have full-text search, so we'll fetch all and filter
             // In production, you might want to use Appwrite's search or Algolia
-            const allProducts = await this.getAllProducts({ limit: 1000 });
+            const allProducts = await this.getAllProducts({ limit: 1000, ...options });
             
             const searchTerm = query.toLowerCase();
             return allProducts.filter(product => 
@@ -416,6 +455,7 @@ class AppwriteDB {
             
             // Clear products cache to ensure fresh data
             this.clearProductsCache();
+            this.bumpDataVersion();
             
             return this.formatDocument(data);
         } catch (error) {
@@ -451,6 +491,7 @@ class AppwriteDB {
             // Update cache
             this.setCache(`${this.cacheConfig.productPrefix}${id}`, product);
             this.clearProductsCache();
+            this.bumpDataVersion();
             
             return product;
         } catch (error) {
@@ -476,6 +517,7 @@ class AppwriteDB {
             // Remove from cache
             this.removeFromCache(`${this.cacheConfig.productPrefix}${id}`);
             this.clearProductsCache();
+            this.bumpDataVersion();
             
             return true;
         } catch (error) {
@@ -542,12 +584,16 @@ class AppwriteDB {
     // ===== Statistics =====
 
     // Get product counts by category with caching
-    async getCategoryCounts() {
+    async getCategoryCounts(forceRefresh = false) {
+        this.syncCacheVersion();
+
         // Check cache first
-        const cached = this.getFromCache(this.cacheConfig.categoryCountsKey);
-        if (cached) {
-            console.log('Returning cached category counts');
-            return cached;
+        if (!forceRefresh) {
+            const cached = this.getFromCache(this.cacheConfig.categoryCountsKey);
+            if (cached) {
+                console.log('Returning cached category counts');
+                return cached;
+            }
         }
         
         try {
