@@ -693,6 +693,9 @@ formatDocument(doc) {
         tags: doc.product_tags || [],
         featured: doc.featured || false,
         badge: doc.badge || '',
+        product_colour: doc.product_colour || '',
+        box: doc.box || 'without box',
+        box_price: doc.box_price || 0,
         created_date: doc.$createdAt || '',
         updated_date: doc.$updatedAt || ''
     };
@@ -720,6 +723,9 @@ formatDocument(doc) {
         if (data.product_tags !== undefined) formatted.product_tags = data.product_tags;
         if (data.featured !== undefined) formatted.featured = data.featured;
         if (data.badge !== undefined) formatted.badge = data.badge;
+        if (data.product_colour !== undefined) formatted.product_colour = data.product_colour;
+        if (data.box !== undefined) formatted.box = data.box;
+        if (data.box_price !== undefined) formatted.box_price = data.box_price;
         if (data.status !== undefined) formatted.status = data.status;
         
         return formatted;

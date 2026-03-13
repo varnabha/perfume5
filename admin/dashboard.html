@@ -275,6 +275,26 @@
                             <label for="short-description">Short Description *</label>
                             <textarea id="short-description" name="short_description" rows="3" required></textarea>
                         </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="product-colour">Product Colour</label>
+                                <input type="text" id="product-colour" name="product_colour" placeholder="e.g. Black, Gold, Silver">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="box-option">Box Option</label>
+                                <select id="box-option" name="box">
+                                    <option value="without box">Without Box</option>
+                                    <option value="box">With Box</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="box-price">Box Price (₹)</label>
+                            <input type="number" id="box-price" name="box_price" min="0" step="0.01" placeholder="Optional extra for box">
+                        </div>
                         
                         <div class="form-group">
                             <label for="product-image">Product Image</label>
@@ -367,6 +387,26 @@
                         <div class="form-group">
                             <label for="edit-short-description">Short Description *</label>
                             <textarea id="edit-short-description" name="short_description" rows="3" required></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="edit-product-colour">Product Colour</label>
+                                <input type="text" id="edit-product-colour" name="product_colour" placeholder="e.g. Black, Gold, Silver">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="edit-box-option">Box Option</label>
+                                <select id="edit-box-option" name="box">
+                                    <option value="without box">Without Box</option>
+                                    <option value="box">With Box</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-box-price">Box Price (₹)</label>
+                            <input type="number" id="edit-box-price" name="box_price" min="0" step="0.01" placeholder="Optional extra for box">
                         </div>
                         
                         <div class="form-group">

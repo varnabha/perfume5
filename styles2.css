@@ -790,6 +790,10 @@ p {
     background: var(--color-primary);
 }
 
+.product-badge.discount {
+    top: 3.1rem;
+}
+
 .product-image-wrapper {
     position: relative;
     aspect-ratio: 1;

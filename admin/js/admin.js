@@ -442,6 +442,9 @@ function initAddProductForm() {
             discount_price: formData.get('discount_price') ? parseFloat(formData.get('discount_price')) : null,
             stock_quantity: parseInt(formData.get('stock_quantity')),
             short_description: formData.get('short_description'),
+            product_colour: formData.get('product_colour') || '',
+            box: formData.get('box') || 'without box',
+            box_price: formData.get('box_price') ? parseFloat(formData.get('box_price')) : 0,
             badge: formData.get('badge') || null,
             featured: formData.get('featured') === 'on'
         };
@@ -515,6 +518,9 @@ function initEditProductForm() {
             discount_price: formData.get('discount_price') ? parseFloat(formData.get('discount_price')) : null,
             stock_quantity: parseInt(formData.get('stock_quantity')),
             short_description: formData.get('short_description'),
+            product_colour: formData.get('product_colour') || '',
+            box: formData.get('box') || 'without box',
+            box_price: formData.get('box_price') ? parseFloat(formData.get('box_price')) : 0,
             badge: formData.get('badge') || null,
             featured: formData.get('featured') === 'on'
         };
@@ -569,6 +575,9 @@ async function editProduct(id) {
         const discountField = document.getElementById('edit-discount-price');
         const stockField = document.getElementById('edit-stock-quantity');
         const descField = document.getElementById('edit-short-description');
+        const colourField = document.getElementById('edit-product-colour');
+        const boxField = document.getElementById('edit-box-option');
+        const boxPriceField = document.getElementById('edit-box-price');
         const badgeField = document.getElementById('edit-product-badge');
         const featuredField = document.getElementById('edit-featured');
         
@@ -579,6 +588,9 @@ async function editProduct(id) {
         if (discountField) discountField.value = product.discount_price || '';
         if (stockField) stockField.value = product.stock_quantity || '';
         if (descField) descField.value = product.short_description || '';
+        if (colourField) colourField.value = product.product_colour || '';
+        if (boxField) boxField.value = product.box || 'without box';
+        if (boxPriceField) boxPriceField.value = product.box_price || '';
         if (badgeField) badgeField.value = product.badge || '';
         if (featuredField) featuredField.checked = product.featured || false;
         
