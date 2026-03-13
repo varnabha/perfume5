@@ -278,8 +278,13 @@
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="product-colour">Product Colour</label>
-                                <input type="text" id="product-colour" name="product_colour" placeholder="e.g. Black, Gold, Silver">
+                                <label for="product-colour-picker">Colour Options</label>
+                                <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
+                                    <input type="color" id="product-colour-picker" value="#000000" style="width: 52px; height: 40px; padding: 0; border: 1px solid #d1d5db; border-radius: 8px;">
+                                    <button type="button" class="btn btn-outline btn-sm" id="add-product-colour-btn">Add Colour</button>
+                                </div>
+                                <div id="product-colour-preview" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
+                                <input type="hidden" id="product-colours-hidden" name="colour_options" value="[]">
                             </div>
 
                             <div class="form-group">
@@ -391,8 +396,13 @@
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="edit-product-colour">Product Colour</label>
-                                <input type="text" id="edit-product-colour" name="product_colour" placeholder="e.g. Black, Gold, Silver">
+                                <label for="edit-product-colour-picker">Colour Options</label>
+                                <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
+                                    <input type="color" id="edit-product-colour-picker" value="#000000" style="width: 52px; height: 40px; padding: 0; border: 1px solid #d1d5db; border-radius: 8px;">
+                                    <button type="button" class="btn btn-outline btn-sm" id="edit-product-colour-btn">Add Colour</button>
+                                </div>
+                                <div id="edit-product-colour-preview" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
+                                <input type="hidden" id="edit-product-colours-hidden" name="colour_options" value="[]">
                             </div>
 
                             <div class="form-group">

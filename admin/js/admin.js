@@ -409,12 +409,103 @@ async function tryUploadProductImage(imageFile) {
 }
 
 // Initialize add product form
+
+function normalizeHexColor(value) {
+    return String(value || '').trim().toLowerCase();
+}
+
+function readColorOptions(hiddenInput) {
+    if (!hiddenInput) return [];
+    try {
+        const parsed = JSON.parse(hiddenInput.value || '[]');
+        if (!Array.isArray(parsed)) return [];
+        return parsed.map(normalizeHexColor).filter(Boolean);
+    } catch (error) {
+        return [];
+    }
+}
+
+function writeColorOptions(hiddenInput, colors) {
+    if (!hiddenInput) return;
+    hiddenInput.value = JSON.stringify(colors);
+}
+
+function renderColorPreview(previewEl, hiddenInput, colors) {
+    if (!previewEl || !hiddenInput) return;
+
+    writeColorOptions(hiddenInput, colors);
+
+    if (colors.length === 0) {
+        previewEl.innerHTML = '<span style="font-size: 0.85rem; color: #6b7280;">No colours added</span>';
+        return;
+    }
+
+    previewEl.innerHTML = colors.map((color, index) => `
+        <div style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.45rem; border: 1px solid #e5e7eb; border-radius: 999px; background: #fff;">
+            <span style="display: inline-block; width: 18px; height: 18px; border-radius: 999px; border: 1px solid #d1d5db; background: ${color};"></span>
+            <span style="font-size: 0.75rem; color: #374151;">${color}</span>
+            <button type="button" data-remove-color="${index}" style="border: none; background: transparent; cursor: pointer; color: #ef4444; font-weight: 700;">×</button>
+        </div>
+    `).join('');
+}
+
+function setupColorPicker({ addButtonId, pickerId, hiddenInputId, previewId }) {
+    const addBtn = document.getElementById(addButtonId);
+    const picker = document.getElementById(pickerId);
+    const hiddenInput = document.getElementById(hiddenInputId);
+    const preview = document.getElementById(previewId);
+
+    if (!addBtn || !picker || !hiddenInput || !preview) return null;
+
+    let colors = readColorOptions(hiddenInput);
+    renderColorPreview(preview, hiddenInput, colors);
+
+    addBtn.addEventListener('click', () => {
+        const selected = normalizeHexColor(picker.value);
+        if (!selected) return;
+        if (!colors.includes(selected)) {
+            colors.push(selected);
+            renderColorPreview(preview, hiddenInput, colors);
+        }
+    });
+
+    preview.addEventListener('click', (event) => {
+        const removeIndex = event.target.getAttribute('data-remove-color');
+        if (removeIndex === null) return;
+        colors = colors.filter((_, index) => index !== Number(removeIndex));
+        renderColorPreview(preview, hiddenInput, colors);
+    });
+
+    return {
+        setColors(nextColors) {
+            colors = (nextColors || []).map(normalizeHexColor).filter(Boolean);
+            renderColorPreview(preview, hiddenInput, colors);
+        },
+        clear() {
+            colors = [];
+            renderColorPreview(preview, hiddenInput, colors);
+        }
+    };
+}
+
+let addColorManager = null;
+let editColorManager = null;
+
 function initAddProductForm() {
     const form = document.getElementById('add-product-form');
     if (!form) return;
     
     const imageInput = document.getElementById('product-image');
     const imagePreview = document.getElementById('image-preview');
+
+    if (!addColorManager) {
+        addColorManager = setupColorPicker({
+            addButtonId: 'add-product-colour-btn',
+            pickerId: 'product-colour-picker',
+            hiddenInputId: 'product-colours-hidden',
+            previewId: 'product-colour-preview'
+        });
+    }
     
     // Image preview
     if (imageInput && imagePreview) {
@@ -442,13 +533,18 @@ function initAddProductForm() {
             discount_price: formData.get('discount_price') ? parseFloat(formData.get('discount_price')) : null,
             stock_quantity: parseInt(formData.get('stock_quantity')),
             short_description: formData.get('short_description'),
-            product_colour: formData.get('product_colour') || '',
+            colour_options: JSON.parse(formData.get('colour_options') || '[]'),
+            product_colour: '',
             box: formData.get('box') || 'without box',
             box_price: formData.get('box_price') ? parseFloat(formData.get('box_price')) : 0,
             badge: formData.get('badge') || null,
             featured: formData.get('featured') === 'on'
         };
         
+        if (Array.isArray(productData.colour_options) && productData.colour_options.length > 0) {
+            productData.product_colour = productData.colour_options[0];
+        }
+
         try {
             showToast('Adding product...', 'info');
             
@@ -469,6 +565,7 @@ function initAddProductForm() {
             }
             form.reset();
             if (imagePreview) imagePreview.innerHTML = '';
+            if (addColorManager) addColorManager.clear();
             
             // Reload data
             refreshAdminData(true);
@@ -490,6 +587,15 @@ function initEditProductForm() {
     
     const imageInput = document.getElementById('edit-product-image');
     const imagePreview = document.getElementById('edit-image-preview');
+
+    if (!editColorManager) {
+        editColorManager = setupColorPicker({
+            addButtonId: 'edit-product-colour-btn',
+            pickerId: 'edit-product-colour-picker',
+            hiddenInputId: 'edit-product-colours-hidden',
+            previewId: 'edit-product-colour-preview'
+        });
+    }
     
     // Image preview
     if (imageInput && imagePreview) {
@@ -518,13 +624,18 @@ function initEditProductForm() {
             discount_price: formData.get('discount_price') ? parseFloat(formData.get('discount_price')) : null,
             stock_quantity: parseInt(formData.get('stock_quantity')),
             short_description: formData.get('short_description'),
-            product_colour: formData.get('product_colour') || '',
+            colour_options: JSON.parse(formData.get('colour_options') || '[]'),
+            product_colour: '',
             box: formData.get('box') || 'without box',
             box_price: formData.get('box_price') ? parseFloat(formData.get('box_price')) : 0,
             badge: formData.get('badge') || null,
             featured: formData.get('featured') === 'on'
         };
         
+        if (Array.isArray(productData.colour_options) && productData.colour_options.length > 0) {
+            productData.product_colour = productData.colour_options[0];
+        }
+
         try {
             showToast('Updating product...', 'info');
             
@@ -544,6 +655,7 @@ function initEditProductForm() {
                 showToast('Product updated successfully!', 'success');
             }
             if (imagePreview) imagePreview.innerHTML = '';
+            if (editColorManager) editColorManager.clear();
             
             // Reload data
             refreshAdminData(true);
@@ -575,7 +687,6 @@ async function editProduct(id) {
         const discountField = document.getElementById('edit-discount-price');
         const stockField = document.getElementById('edit-stock-quantity');
         const descField = document.getElementById('edit-short-description');
-        const colourField = document.getElementById('edit-product-colour');
         const boxField = document.getElementById('edit-box-option');
         const boxPriceField = document.getElementById('edit-box-price');
         const badgeField = document.getElementById('edit-product-badge');
@@ -588,7 +699,7 @@ async function editProduct(id) {
         if (discountField) discountField.value = product.discount_price || '';
         if (stockField) stockField.value = product.stock_quantity || '';
         if (descField) descField.value = product.short_description || '';
-        if (colourField) colourField.value = product.product_colour || '';
+        if (editColorManager) editColorManager.setColors(product.colour_options || []);
         if (boxField) boxField.value = product.box || 'without box';
         if (boxPriceField) boxPriceField.value = product.box_price || '';
         if (badgeField) badgeField.value = product.badge || '';
