@@ -150,8 +150,29 @@
             return params.get('id');
         }
 
+        function isHexColor(value) {
+            return /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(String(value || '').trim());
+        }
+
+        function renderColourDisplay(colourValue) {
+            const value = String(colourValue || '').trim();
+            if (!value) return '';
+
+            if (isHexColor(value)) {
+                const normalized = value.toLowerCase();
+                return `
+                    <span style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.8rem; background: var(--background); border-radius: 999px; font-size: 0.85rem;">
+                        <span style="display:inline-block; width: 16px; height: 16px; border-radius: 999px; border: 1px solid #d1d5db; background:${normalized};"></span>
+                        <strong>Colour:</strong> ${getColorName(normalized)}
+                    </span>
+                `;
+            }
+
+            return `<span style="padding: 0.4rem 0.8rem; background: var(--background); border-radius: 999px; font-size: 0.85rem;"><strong>Colour:</strong> ${value}</span>`;
+        }
+
         // Load product details
-        async function loadProductDetails() {
+        async function loadProductDetails(forceRefresh = false) {
             const productId = getProductId();
             const container = document.getElementById('product-detail');
             
@@ -170,7 +191,9 @@
             showLoading(container, 'Loading product details...');
             
             try {
-                const product = await appwriteDB.getProductById(productId);
+                const product = forceRefresh
+                    ? await appwriteDB.getProductById(productId, { forceRefresh: true })
+                    : await appwriteDB.getProductById(productId);
                 
                 if (!product) {
                     container.innerHTML = `
@@ -191,7 +214,7 @@
                 
                 renderProductDetails(product);
                 updateBreadcrumb(product);
-                loadRelatedProducts(product);
+                loadRelatedProducts(product, forceRefresh);
                 
             } catch (error) {
                 console.error('Error loading product:', error);
@@ -240,6 +263,12 @@
                     </div>
                     
                     ${stockStatus}
+
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1rem 0;">
+                        ${renderColourDisplay(product.product_colour)}
+                        <span style="padding: 0.4rem 0.8rem; background: var(--background); border-radius: 999px; font-size: 0.85rem;"><strong>Option:</strong> ${product.box === 'box' ? 'With Box' : 'Without Box'}</span>
+                        ${product.box === 'box' && Number(product.box_price) > 0 ? `<span style="padding: 0.4rem 0.8rem; background: var(--background); border-radius: 999px; font-size: 0.85rem;"><strong>Box Price:</strong> ${formatPrice(product.box_price)}</span>` : ''}
+                    </div>
                     
                     <div class="product-description-full">
                         <h3>Description</h3>
@@ -322,13 +351,14 @@
         }
 
         // Load related products
-        async function loadRelatedProducts(currentProduct) {
+        async function loadRelatedProducts(currentProduct, forceRefresh = false) {
             const container = document.getElementById('related-products');
             
             try {
                 const products = await appwriteDB.getAllProducts({ 
                     category: currentProduct.category,
-                    limit: 4 
+                    limit: 4,
+                    forceRefresh
                 });
                 
                 // Filter out current product
@@ -353,6 +383,15 @@
         // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
             loadProductDetails();
+
+            const refreshProduct = () => loadProductDetails(true);
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) refreshProduct();
+            });
+            window.addEventListener('focus', refreshProduct);
+            window.addEventListener('storage', (event) => {
+                if (event.key === 'products_data_version') refreshProduct();
+            });
         });
     </script>
 </body>

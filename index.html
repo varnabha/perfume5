@@ -587,13 +587,13 @@
         }
 
         // Load products from Supabase
-        async function loadProducts() {
+        async function loadProducts(forceRefresh = false) {
             const container = document.getElementById('products-grid');
             showLoading(container, 'Loading products...');
             
             try {
                 // Fetch max 8 products for the index page
-                const products = await appwriteDB.getAllProducts({ limit: 8 });
+                const products = await appwriteDB.getAllProducts({ limit: 8, forceRefresh });
                 allProducts = products;
                 
                 filterAndRenderProducts();
@@ -719,6 +719,15 @@
             // Load dynamic content
             loadCategories();
             loadProducts();
+
+            const refreshProducts = () => loadProducts(true);
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) refreshProducts();
+            });
+            window.addEventListener('focus', refreshProducts);
+            window.addEventListener('storage', (event) => {
+                if (event.key === 'products_data_version') refreshProducts();
+            });
             
             // Filter tabs functionality
             const filterTabs = document.querySelectorAll('.filter-tab');
