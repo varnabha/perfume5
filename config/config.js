@@ -21,7 +21,8 @@ const CONFIG = {
     projectId: '69b3bf3c0025d8a05b28',
     databaseId: '69b3c54b002196d96204',
     productsCollectionId: 'products',  // The collection/table we just created
-    bucketId: '69b3c75400312816f5e1'  // You still need to create this in Appwrite Storage
+    bucketId: '69b3c75400312816f5e1',  // You still need to create this in Appwrite Storage
+    apiKey: 'standard_1d600da673fae48a78afd9c0c6bb7e8f37d2ffce4376734ee28abfcea27c45315242bf96853885d43406d2fd54bb7a32d9273f5ea893cdcdced412397f467f42cf8f250a111993055cdb13d15b0e9218d9882216cc698a03f6cde69f11a923982cfca967cad09b003c127ecb7ef78c1488aeb877114b0d676d45c2756856436a' // Full access API key
 },
     
     // Cache Configuration
