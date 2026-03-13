@@ -34,7 +34,10 @@
 
 body {
     font-family: var(--font-body);
-    background: var(--background);
+    background:
+        radial-gradient(circle at 8% 8%, rgba(233, 69, 96, 0.06), transparent 26%),
+        radial-gradient(circle at 92% 0%, rgba(10, 10, 46, 0.08), transparent 30%),
+        var(--background);
     color: var(--text);
     line-height: 1.6;
 }
@@ -152,6 +155,17 @@ body {
 .section-header {
     text-align: center;
     margin-bottom: 2.5rem;
+    position: relative;
+}
+
+.section-header::after {
+    content: '';
+    width: 64px;
+    height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    display: block;
+    margin: 0.65rem auto 0;
 }
 
 .section-header h2 {
@@ -213,11 +227,27 @@ body {
     overflow: hidden;
     box-shadow: var(--shadow);
     transition: var(--transition);
+    border: 1px solid rgba(233, 69, 96, 0.12);
+    position: relative;
 }
 
 .product-card:hover {
     transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 16px 38px rgba(15, 23, 42, 0.16), 0 8px 24px rgba(233, 69, 96, 0.15);
+}
+
+.product-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 0%, rgba(233, 69, 96, 0.08) 48%, transparent 100%);
+    transform: translateX(-120%);
+    transition: transform 0.7s ease;
+    pointer-events: none;
+}
+
+.product-card:hover::before {
+    transform: translateX(120%);
 }
 
 .product-image {
