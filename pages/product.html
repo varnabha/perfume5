@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - Storeify Watches</title>
+    <meta name="description" content="View product details and order through WhatsApp.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="../css/styles1.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌚</text></svg>">
+    
+    <style>
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            color: var(--light-text);
+            font-size: 0.875rem;
+        }
+        
+        .breadcrumb a:hover {
+            color: var(--accent);
+        }
+        
+        .breadcrumb-separator {
+            opacity: 0.5;
+        }
+        
+        .related-products {
+            margin-top: 4rem;
+            padding-top: 4rem;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">
+                <div class="logo-icon">⌚</div>
+                <span>Storeify</span>
+            </a>
+            
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="products.html?category=watches">Watches</a></li>
+                <li><a href="products.html?category=perfumes">Perfumes</a></li>
+                <li><a href="../index.html#footer">Contact</a></li>
+            </ul>
+            
+            <button class="mobile-menu-btn" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Product Detail Section -->
+    <section class="product-detail">
+        <div class="container">
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="breadcrumb-separator">/</span>
+                <a href="products.html">Products</a>
+                <span class="breadcrumb-separator">/</span>
+                <span id="breadcrumb-category">Category</span>
+                <span class="breadcrumb-separator">/</span>
+                <span id="breadcrumb-product">Product</span>
+            </nav>
+            
+            <!-- Product Detail Grid -->
+            <div class="product-detail-grid" id="product-detail">
+                <!-- Product details will be loaded dynamically -->
+            </div>
+            
+            <!-- Related Products -->
+            <div class="related-products">
+                <div class="section-header">
+                    <h2>You May Also Like</h2>
+                    <p>Similar products you might be interested in</p>
+                </div>
+                <div class="products-grid" id="related-products">
+                    <!-- Related products will be loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Storeify Watches</h3>
+                    <p>Your destination for premium lifestyle accessories.</p>
+                    <div class="social-links">
+                        <a href="https://instagram.com" target="_blank">📷</a>
+                        <a href="https://facebook.com" target="_blank">📘</a>
+                        <a href="https://twitter.com" target="_blank">🐦</a>
+                        <a href="https://wa.me/919689467611" target="_blank">💬</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="products.html?category=watches">Watches</a></li>
+                        <li><a href="products.html?category=perfumes">Perfumes</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <ul>
+                        <li>📧 support@storeifywatches.com</li>
+                        <li>📱 +91 9689467611</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Storeify Watches. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../config/config.js"></script>
+    <script src="../js/appwrite.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+        let currentProduct = null;
+        let selectedColor = null;
+
+        // Get product ID from URL
+        function getProductId() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        // Load product details
+        async function loadProductDetails() {
+            const productId = getProductId();
+            const container = document.getElementById('product-detail');
+            
+            if (!productId) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-state-icon">⚠️</div>
+                        <h3>Product Not Found</h3>
+                        <p>No product ID specified.</p>
+                        <a href="products.html" class="btn btn-primary mt-3">Browse Products</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            showLoading(container, 'Loading product details...');
+            
+            try {
+                const product = await appwriteDB.getProductById(productId);
+                
+                if (!product) {
+                    container.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1/-1;">
+                            <div class="empty-state-icon">📦</div>
+                            <h3>Product Not Found</h3>
+                            <p>The product you're looking for doesn't exist or has been removed.</p>
+                            <a href="products.html" class="btn btn-primary mt-3">Browse Products</a>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                currentProduct = product;
+                selectedColor = product.colour_options && product.colour_options.length > 0 
+                    ? product.colour_options[0] 
+                    : null;
+                
+                renderProductDetails(product);
+                updateBreadcrumb(product);
+                loadRelatedProducts(product);
+                
+            } catch (error) {
+                console.error('Error loading product:', error);
+                showError(container, 'Failed to load product details. Please try again.');
+            }
+        }
+
+        // Render product details
+        function renderProductDetails(product) {
+            const container = document.getElementById('product-detail');
+            const discount = calculateDiscount(product.main_price, product.discount_price);
+            const finalPrice = product.discount_price || product.main_price;
+            const hasColors = product.colour_options && product.colour_options.length > 0;
+            
+            // Determine stock status
+            let stockStatus = '';
+            let stockClass = '';
+            if (product.stock_quantity <= 0) {
+                stockStatus = '<span class="stock-status out">● Out of Stock</span>';
+                stockClass = 'out';
+            } else if (product.stock_quantity < 10) {
+                stockStatus = `<span class="stock-status low">● Only ${product.stock_quantity} left</span>`;
+                stockClass = 'low';
+            } else {
+                stockStatus = '<span class="stock-status">● In Stock</span>';
+                stockClass = 'in';
+            }
+            
+            container.innerHTML = `
+                <div class="product-detail-image">
+                    <img src="${product.product_image_url || '../assets/images/placeholder.jpg'}" 
+                         alt="${product.product_name}"
+                         onerror="this.src='../assets/images/placeholder.jpg'">
+                </div>
+                
+                <div class="product-detail-info">
+                    <span class="product-category">${product.category}</span>
+                    <h1>${product.product_name}</h1>
+                    
+                    <div class="product-price">
+                        <span class="price-current">${formatPrice(finalPrice)}</span>
+                        ${discount > 0 ? `
+                            <span class="price-original">${formatPrice(product.main_price)}</span>
+                            <span class="discount-badge">-${discount}% OFF</span>
+                        ` : ''}
+                    </div>
+                    
+                    ${stockStatus}
+                    
+                    <div class="product-description-full">
+                        <h3>Description</h3>
+                        <p>${product.short_description || 'No description available.'}</p>
+                    </div>
+                    
+                    ${hasColors ? `
+                        <div class="product-colors-section">
+                            <h3>Select Color</h3>
+                            <div class="colors-list" id="color-options">
+                                ${product.colour_options.map((color, index) => `
+                                    <div class="color-option ${index === 0 ? 'selected' : ''}" data-color="${color}">
+                                        <span class="color-dot" style="background-color: ${color};"></span>
+                                        <span>${getColorName(color)}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    ${product.product_tags && product.product_tags.length > 0 ? `
+                        <div style="margin: 1.5rem 0;">
+                            <h3 style="font-size: 1rem; margin-bottom: 0.75rem;">Tags</h3>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                ${product.product_tags.map(tag => `
+                                    <span style="padding: 0.5rem 1rem; background: var(--background); border-radius: 50px; font-size: 0.875rem; color: var(--light-text);">${tag}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="product-detail-actions">
+                        <a href="${generateWhatsAppLink(product, selectedColor)}" 
+                           target="_blank" 
+                           class="btn btn-accent btn-lg"
+                           id="whatsapp-btn"
+                           ${stockClass === 'out' ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>
+                            ${stockClass === 'out' ? 'Out of Stock' : 'Book This Item'}
+                        </a>
+                        <a href="products.html?category=${product.category}" class="btn btn-outline btn-lg">More in ${product.category}</a>
+                    </div>
+                    
+                    <div style="margin-top: 2rem; padding: 1.5rem; background: var(--background); border-radius: var(--border-radius);">
+                        <h3 style="font-size: 1rem; margin-bottom: 1rem;">Why Order Through WhatsApp?</h3>
+                        <ul style="list-style: none; color: var(--light-text);">
+                            <li style="margin-bottom: 0.5rem;">✓ Instant confirmation</li>
+                            <li style="margin-bottom: 0.5rem;">✓ Direct communication</li>
+                            <li style="margin-bottom: 0.5rem;">✓ Easy payment options</li>
+                            <li>✓ Track your order</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+            
+            // Add color selection handlers
+            if (hasColors) {
+                document.querySelectorAll('.color-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+                        option.classList.add('selected');
+                        selectedColor = option.dataset.color;
+                        updateWhatsAppLink();
+                    });
+                });
+            }
+        }
+
+        // Update WhatsApp link with selected color
+        function updateWhatsAppLink() {
+            const btn = document.getElementById('whatsapp-btn');
+            if (btn && currentProduct) {
+                btn.href = generateWhatsAppLink(currentProduct, selectedColor);
+            }
+        }
+
+        // Update breadcrumb
+        function updateBreadcrumb(product) {
+            document.getElementById('breadcrumb-category').textContent = product.category;
+            document.getElementById('breadcrumb-product').textContent = product.product_name;
+        }
+
+        // Load related products
+        async function loadRelatedProducts(currentProduct) {
+            const container = document.getElementById('related-products');
+            
+            try {
+                const products = await appwriteDB.getAllProducts({ 
+                    category: currentProduct.category,
+                    limit: 4 
+                });
+                
+                // Filter out current product
+                const related = products.filter(p => p.id !== currentProduct.id).slice(0, 3);
+                
+                if (related.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1/-1;">
+                            <p>No related products found.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = related.map(product => createProductCard(product)).join('');
+            } catch (error) {
+                console.error('Error loading related products:', error);
+                container.innerHTML = '';
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProductDetails();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Storeify Watches</title>
+    <meta name="description" content="Admin login for Storeify Watches">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/admin.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌚</text></svg>">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <div class="logo">
+                    <div class="logo-icon">⌚</div>
+                    <span>Storeify</span>
+                </div>
+                <h1>Admin Login</h1>
+                <p>Enter your password to access the dashboard</p>
+            </div>
+            
+            <form id="login-form" class="login-form">
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter admin password" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block">
+                    <span>Login</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </form>
+            
+            <div id="login-error" class="login-error" style="display: none;">
+                Incorrect password. Please try again.
+            </div>
+            
+            <div class="login-footer">
+                <a href="../index.html">← Back to Store</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../config/config.js"></script>
+    <script>
+        // Check if already logged in
+        document.addEventListener('DOMContentLoaded', () => {
+            const session = localStorage.getItem('adminSession');
+            if (session) {
+                const sessionData = JSON.parse(session);
+                if (sessionData.expiry > Date.now()) {
+                    window.location.href = 'dashboard.html';
+                    return;
+                } else {
+                    localStorage.removeItem('adminSession');
+                }
+            }
+        });
+
+        // Handle login form
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('login-error');
+            
+            if (password === CONFIG.admin.password) {
+                // Create session
+                const session = {
+                    loggedIn: true,
+                    expiry: Date.now() + CONFIG.admin.sessionDuration
+                };
+                localStorage.setItem('adminSession', JSON.stringify(session));
+                
+                // Redirect to dashboard
+                window.location.href = 'dashboard.html';
+            } else {
+                errorEl.style.display = 'block';
+                document.getElementById('password').value = '';
+            }
+        });
+    </script>
+</body>
+</html>

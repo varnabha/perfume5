@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - Storeify Watches</title>
+    <meta name="description" content="Browse our complete collection of premium watches, perfumes, sunglasses, and lifestyle accessories.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="../css/styles1.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌚</text></svg>">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">
+                <div class="logo-icon">⌚</div>
+                <span>Storeify</span>
+            </a>
+            
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="products.html" class="active">Products</a></li>
+                <li><a href="products.html?category=watches">Watches</a></li>
+                <li><a href="products.html?category=perfumes">Perfumes</a></li>
+                <li><a href="../index.html#footer">Contact</a></li>
+            </ul>
+            
+            <button class="mobile-menu-btn" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Products Section -->
+    <section class="section products-section" style="padding-top: 120px;">
+        <div class="container">
+            <div class="section-header">
+                <h2 id="page-title">All Products</h2>
+                <p id="page-description">Browse our complete collection of premium lifestyle accessories</p>
+            </div>
+            
+            <!-- Search Bar -->
+            <div style="max-width: 600px; margin: 0 auto 2rem;">
+                <div style="position: relative;">
+                    <input type="text" 
+                           id="search-input" 
+                           placeholder="Search products..." 
+                           style="width: 100%; padding: 1rem 1.5rem 1rem 3rem; border: 2px solid var(--border); border-radius: 50px; font-size: 1rem; transition: var(--transition);">
+                    <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); font-size: 1.25rem;">🔍</span>
+                </div>
+            </div>
+            
+            <!-- Category Filters -->
+            <div class="products-filter" id="category-filters">
+                <button class="filter-btn active" data-category="all">All</button>
+                <button class="filter-btn" data-category="watches">Watches</button>
+                <button class="filter-btn" data-category="perfumes">Perfumes</button>
+                <button class="filter-btn" data-category="sunglasses">Sunglasses</button>
+                <button class="filter-btn" data-category="couple-accessories">Couple Accessories</button>
+                <button class="filter-btn" data-category="lifestyle">Lifestyle</button>
+            </div>
+            
+            <!-- Results Count -->
+            <div style="margin-bottom: 1.5rem; color: var(--light-text);">
+                <span id="results-count">Loading...</span>
+            </div>
+            
+            <!-- Products Grid -->
+            <div class="products-grid" id="products-grid">
+                <!-- Products will be loaded dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Storeify Watches</h3>
+                    <p>Your destination for premium lifestyle accessories.</p>
+                    <div class="social-links">
+                        <a href="https://instagram.com" target="_blank">📷</a>
+                        <a href="https://facebook.com" target="_blank">📘</a>
+                        <a href="https://twitter.com" target="_blank">🐦</a>
+                        <a href="https://wa.me/919689467611" target="_blank">💬</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="products.html?category=watches">Watches</a></li>
+                        <li><a href="products.html?category=perfumes">Perfumes</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <ul>
+                        <li>📧 support@storeifywatches.com</li>
+                        <li>📱 +91 98765 43210</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Storeify Watches. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../config/config.js"></script>
+    <script src="../js/appwrite.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+        let currentCategory = 'all';
+        let allProducts = [];
+        let filteredProducts = [];
+
+        // Get URL parameters
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                category: params.get('category') || 'all',
+                featured: params.get('featured') === 'true',
+                search: params.get('search') || ''
+            };
+        }
+
+        // Update page title and description
+        function updatePageHeader(params) {
+            const titleEl = document.getElementById('page-title');
+            const descEl = document.getElementById('page-description');
+            
+            if (params.featured) {
+                titleEl.textContent = 'Featured Products';
+                descEl.textContent = 'Our handpicked selection of premium items';
+            } else if (params.category && params.category !== 'all') {
+                const category = CONFIG.categories.find(c => c.id === params.category);
+                titleEl.textContent = category ? category.name : 'Products';
+                descEl.textContent = `Browse our ${category ? category.name.toLowerCase() : 'product'} collection`;
+            } else if (params.search) {
+                titleEl.textContent = 'Search Results';
+                descEl.textContent = `Results for "${params.search}"`;
+            } else {
+                titleEl.textContent = 'All Products';
+                descEl.textContent = 'Browse our complete collection of premium lifestyle accessories';
+            }
+        }
+
+        // Load products
+        async function loadProducts() {
+            const container = document.getElementById('products-grid');
+            const params = getUrlParams();
+            
+            showLoading(container, 'Loading products...');
+            updatePageHeader(params);
+            
+            try {
+                let products;
+                
+                if (params.search) {
+                    products = await appwriteDB.searchProducts(params.search);
+                    document.getElementById('search-input').value = params.search;
+                } else if (params.featured) {
+                    products = await appwriteDB.getFeaturedProducts(100);
+                } else {
+                    products = await appwriteDB.getAllProducts({ 
+                        category: params.category,
+                        limit: 100 
+                    });
+                }
+                
+                allProducts = products;
+                filteredProducts = products;
+                
+                updateResultsCount();
+                renderProducts();
+                
+                // Update active filter button
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.category === params.category);
+                });
+                
+            } catch (error) {
+                console.error('Error loading products:', error);
+                showError(container, 'Failed to load products. Please try again.');
+            }
+        }
+
+        // Render products
+        function renderProducts() {
+            const container = document.getElementById('products-grid');
+            
+            if (filteredProducts.length === 0) {
+                showEmpty(container, 'No products found matching your criteria.');
+                return;
+            }
+            
+            container.innerHTML = filteredProducts.map(product => createProductCard(product)).join('');
+        }
+
+        // Update results count
+        function updateResultsCount() {
+            const count = filteredProducts.length;
+            document.getElementById('results-count').textContent = 
+                `${count} product${count !== 1 ? 's' : ''} found`;
+        }
+
+        // Filter products by search
+        function filterProducts(searchTerm) {
+            if (!searchTerm.trim()) {
+                filteredProducts = allProducts;
+            } else {
+                const term = searchTerm.toLowerCase();
+                filteredProducts = allProducts.filter(product => 
+                    product.product_name.toLowerCase().includes(term) ||
+                    product.short_description?.toLowerCase().includes(term) ||
+                    product.category.toLowerCase().includes(term)
+                );
+            }
+            updateResultsCount();
+            renderProducts();
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = getUrlParams();
+            currentCategory = params.category;
+            
+            // Load products
+            loadProducts();
+            
+            // Category filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const category = btn.dataset.category;
+                    
+                    // Update active state
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // Update URL without reloading
+                    const url = new URL(window.location);
+                    if (category === 'all') {
+                        url.searchParams.delete('category');
+                    } else {
+                        url.searchParams.set('category', category);
+                    }
+                    url.searchParams.delete('featured');
+                    window.history.pushState({}, '', url);
+                    
+                    // Reload products
+                    currentCategory = category;
+                    loadProducts();
+                });
+            });
+            
+            // Search functionality
+            const searchInput = document.getElementById('search-input');
+            const debouncedSearch = debounce((term) => {
+                filterProducts(term);
+                
+                // Update URL
+                const url = new URL(window.location);
+                if (term) {
+                    url.searchParams.set('search', term);
+                } else {
+                    url.searchParams.delete('search');
+                }
+                window.history.pushState({}, '', url);
+            }, 300);
+            
+            searchInput.addEventListener('input', (e) => {
+                debouncedSearch(e.target.value);
+            });
+        });
+    </script>
+</body>
+</html>
