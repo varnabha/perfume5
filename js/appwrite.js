@@ -429,6 +429,38 @@ class AppwriteDB {
 
     // ===== Admin Operations =====
 
+    // Extract unknown attribute name from Appwrite validation errors
+    extractUnknownAttribute(errorMessage = '') {
+        const match = String(errorMessage).match(/Unknown attribute:\s*"([^"]+)"/i);
+        return match ? match[1] : null;
+    }
+
+    // Retry payload by dropping fields not present in current Appwrite collection schema
+    async executeWithSchemaRetry(requestFn, formattedData) {
+        let payload = { ...formattedData };
+        const maxRetries = 5;
+
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+            const response = await requestFn(payload);
+            if (response.ok) {
+                return response;
+            }
+
+            const errorData = await response.json().catch(() => ({}));
+            const message = errorData.message || `HTTP error! status: ${response.status}`;
+            const unknownAttr = this.extractUnknownAttribute(message);
+
+            if (!unknownAttr || !(unknownAttr in payload)) {
+                throw new Error(message);
+            }
+
+            console.warn(`Skipping unknown Appwrite attribute: ${unknownAttr}`);
+            delete payload[unknownAttr];
+        }
+
+        throw new Error('Could not process write request after removing unknown attributes.');
+    }
+
     // Add new product
     async addProduct(productData) {
         try {
@@ -437,19 +469,17 @@ class AppwriteDB {
             // Format data for Appwrite
             const formattedData = this.formatDataForAppwrite(productData);
             
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: this.getHeaders(true), // CRITICAL: Include API key
-                body: JSON.stringify({
-                    documentId: 'unique()',
-                    data: formattedData
-                })
-            });
-            
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-            }
+            const response = await this.executeWithSchemaRetry(
+                (payload) => fetch(url, {
+                    method: 'POST',
+                    headers: this.getHeaders(true), // CRITICAL: Include API key
+                    body: JSON.stringify({
+                        documentId: 'unique()',
+                        data: payload
+                    })
+                }),
+                formattedData
+            );
             
             const data = await response.json();
             
@@ -472,18 +502,16 @@ class AppwriteDB {
             // Format data for Appwrite
             const formattedData = this.formatDataForAppwrite(productData);
             
-            const response = await fetch(url, {
-                method: 'PATCH',
-                headers: this.getHeaders(true), // CRITICAL: Include API key
-                body: JSON.stringify({
-                    data: formattedData
-                })
-            });
-            
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-            }
+            const response = await this.executeWithSchemaRetry(
+                (payload) => fetch(url, {
+                    method: 'PATCH',
+                    headers: this.getHeaders(true), // CRITICAL: Include API key
+                    body: JSON.stringify({
+                        data: payload
+                    })
+                }),
+                formattedData
+            );
             
             const data = await response.json();
             const product = this.formatDocument(data);
