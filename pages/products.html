@@ -161,7 +161,7 @@
         }
 
         // Load products
-        async function loadProducts() {
+        async function loadProducts(forceRefresh = false) {
             const container = document.getElementById('products-grid');
             const params = getUrlParams();
             
@@ -172,14 +172,15 @@
                 let products;
                 
                 if (params.search) {
-                    products = await appwriteDB.searchProducts(params.search);
+                    products = await appwriteDB.searchProducts(params.search, { forceRefresh });
                     document.getElementById('search-input').value = params.search;
                 } else if (params.featured) {
-                    products = await appwriteDB.getFeaturedProducts(100);
+                    products = await appwriteDB.getFeaturedProducts(100, { forceRefresh });
                 } else {
                     products = await appwriteDB.getAllProducts({ 
                         category: params.category,
-                        limit: 100 
+                        limit: 100,
+                        forceRefresh
                     });
                 }
                 
@@ -242,6 +243,15 @@
             
             // Load products
             loadProducts();
+
+            const refreshProducts = () => loadProducts(true);
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) refreshProducts();
+            });
+            window.addEventListener('focus', refreshProducts);
+            window.addEventListener('storage', (event) => {
+                if (event.key === 'products_data_version') refreshProducts();
+            });
             
             // Category filter buttons
             document.querySelectorAll('.filter-btn').forEach(btn => {
