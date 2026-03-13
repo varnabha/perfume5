@@ -384,6 +384,30 @@ function initProductSearch() {
     }
 }
 
+function isAuthorizationError(error) {
+    if (!error) return false;
+    const message = String(error.message || error).toLowerCase();
+    return message.includes('not authorized') ||
+           message.includes('unauthorized') ||
+           message.includes('forbidden') ||
+           message.includes('permission');
+}
+
+async function tryUploadProductImage(imageFile) {
+    if (!imageFile) return { imageUrl: null, skipped: false };
+
+    try {
+        const imageUrl = await appwriteDB.uploadImage(imageFile);
+        return { imageUrl, skipped: false };
+    } catch (error) {
+        if (isAuthorizationError(error)) {
+            showToast('Image upload is not authorized in Appwrite bucket settings. Product details will still be saved.', 'warning', 5000);
+            return { imageUrl: null, skipped: true };
+        }
+        throw error;
+    }
+}
+
 // Initialize add product form
 function initAddProductForm() {
     const form = document.getElementById('add-product-form');
@@ -427,15 +451,19 @@ function initAddProductForm() {
             
             // Upload image if selected
             const imageFile = imageInput ? imageInput.files[0] : null;
-            if (imageFile) {
-                const imageUrl = await appwriteDB.uploadImage(imageFile);
-                productData.product_image_url = imageUrl;
+            const uploadResult = await tryUploadProductImage(imageFile);
+            if (uploadResult.imageUrl) {
+                productData.product_image_url = uploadResult.imageUrl;
             }
             
             // Add product
             await appwriteDB.addProduct(productData);
             
-            showToast('Product added successfully!', 'success');
+            if (uploadResult.skipped) {
+                showToast('Product added, but image upload was skipped due to Appwrite permissions.', 'warning', 5000);
+            } else {
+                showToast('Product added successfully!', 'success');
+            }
             form.reset();
             if (imagePreview) imagePreview.innerHTML = '';
             
@@ -496,15 +524,19 @@ function initEditProductForm() {
             
             // Upload new image if selected
             const imageFile = imageInput ? imageInput.files[0] : null;
-            if (imageFile) {
-                const imageUrl = await appwriteDB.uploadImage(imageFile);
-                productData.product_image_url = imageUrl;
+            const uploadResult = await tryUploadProductImage(imageFile);
+            if (uploadResult.imageUrl) {
+                productData.product_image_url = uploadResult.imageUrl;
             }
             
             // Update product
             await appwriteDB.updateProduct(productId, productData);
             
-            showToast('Product updated successfully!', 'success');
+            if (uploadResult.skipped) {
+                showToast('Product updated, but image upload was skipped due to Appwrite permissions.', 'warning', 5000);
+            } else {
+                showToast('Product updated successfully!', 'success');
+            }
             if (imagePreview) imagePreview.innerHTML = '';
             
             // Reload data
