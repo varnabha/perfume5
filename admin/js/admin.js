@@ -44,6 +44,32 @@ function initDashboard() {
     
     // Initialize search
     initProductSearch();
+
+    // Keep admin data fresh when tab regains focus or another tab updates products
+    initLiveRefresh();
+}
+
+function initLiveRefresh() {
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            refreshAdminData(true);
+        }
+    });
+
+    window.addEventListener('focus', () => refreshAdminData(true));
+
+    window.addEventListener('storage', (event) => {
+        if (event.key === 'products_data_version') {
+            refreshAdminData(true);
+        }
+    });
+}
+
+function refreshAdminData(forceRefresh = false) {
+    loadDashboardStats(forceRefresh);
+    loadRecentProducts(forceRefresh);
+    loadAllProducts(forceRefresh);
+    loadCategoryDistribution(forceRefresh);
 }
 
 // Navigation
@@ -103,9 +129,9 @@ function logout() {
 }
 
 // Load dashboard statistics
-async function loadDashboardStats() {
+async function loadDashboardStats(forceRefresh = false) {
     try {
-        const products = await appwriteDB.getAllProducts({ limit: 1000 });
+        const products = await appwriteDB.getAllProducts({ limit: 1000, forceRefresh });
         
         // Total products
         const totalProductsEl = document.getElementById('total-products');
@@ -133,9 +159,11 @@ async function loadDashboardStats() {
 }
 
 // Load category distribution
-async function loadCategoryDistribution() {
+async function loadCategoryDistribution(forceRefresh = false) {
     try {
-        const counts = await appwriteDB.getCategoryCounts();
+        const counts = forceRefresh
+            ? await appwriteDB.getCategoryCounts(true)
+            : await appwriteDB.getCategoryCounts();
         const container = document.getElementById('category-distribution');
         
         if (!container) return;
@@ -176,9 +204,9 @@ async function loadCategoryDistribution() {
 }
 
 // Load recent products
-async function loadRecentProducts() {
+async function loadRecentProducts(forceRefresh = false) {
     try {
-        const products = await appwriteDB.getAllProducts({ limit: 5 });
+        const products = await appwriteDB.getAllProducts({ limit: 5, forceRefresh });
         const tbody = document.getElementById('recent-products-table');
         
         if (!tbody) return;
@@ -228,9 +256,9 @@ let allProducts = [];
 let currentPage = 1;
 const productsPerPage = 10;
 
-async function loadAllProducts() {
+async function loadAllProducts(forceRefresh = false) {
     try {
-        const products = await appwriteDB.getAllProducts({ limit: 1000 });
+        const products = await appwriteDB.getAllProducts({ limit: 1000, forceRefresh });
         allProducts = products;
         renderProductsTable();
     } catch (error) {
@@ -356,6 +384,30 @@ function initProductSearch() {
     }
 }
 
+function isAuthorizationError(error) {
+    if (!error) return false;
+    const message = String(error.message || error).toLowerCase();
+    return message.includes('not authorized') ||
+           message.includes('unauthorized') ||
+           message.includes('forbidden') ||
+           message.includes('permission');
+}
+
+async function tryUploadProductImage(imageFile) {
+    if (!imageFile) return { imageUrl: null, skipped: false };
+
+    try {
+        const imageUrl = await appwriteDB.uploadImage(imageFile);
+        return { imageUrl, skipped: false };
+    } catch (error) {
+        if (isAuthorizationError(error)) {
+            showToast('Image upload is not authorized in Appwrite bucket settings. Product details will still be saved.', 'warning', 5000);
+            return { imageUrl: null, skipped: true };
+        }
+        throw error;
+    }
+}
+
 // Initialize add product form
 function initAddProductForm() {
     const form = document.getElementById('add-product-form');
@@ -390,6 +442,9 @@ function initAddProductForm() {
             discount_price: formData.get('discount_price') ? parseFloat(formData.get('discount_price')) : null,
             stock_quantity: parseInt(formData.get('stock_quantity')),
             short_description: formData.get('short_description'),
+            product_colour: formData.get('product_colour') || '',
+            box: formData.get('box') || 'without box',
+            box_price: formData.get('box_price') ? parseFloat(formData.get('box_price')) : 0,
             badge: formData.get('badge') || null,
             featured: formData.get('featured') === 'on'
         };
@@ -399,23 +454,24 @@ function initAddProductForm() {
             
             // Upload image if selected
             const imageFile = imageInput ? imageInput.files[0] : null;
-            if (imageFile) {
-                const imageUrl = await appwriteDB.uploadImage(imageFile);
-                productData.product_image_url = imageUrl;
+            const uploadResult = await tryUploadProductImage(imageFile);
+            if (uploadResult.imageUrl) {
+                productData.product_image_url = uploadResult.imageUrl;
             }
             
             // Add product
             await appwriteDB.addProduct(productData);
             
-            showToast('Product added successfully!', 'success');
+            if (uploadResult.skipped) {
+                showToast('Product added, but image upload was skipped due to Appwrite permissions.', 'warning', 5000);
+            } else {
+                showToast('Product added successfully!', 'success');
+            }
             form.reset();
             if (imagePreview) imagePreview.innerHTML = '';
             
             // Reload data
-            loadDashboardStats();
-            loadRecentProducts();
-            loadAllProducts();
-            loadCategoryDistribution();
+            refreshAdminData(true);
             
             // Switch to products section
             showSection('products');
@@ -462,6 +518,9 @@ function initEditProductForm() {
             discount_price: formData.get('discount_price') ? parseFloat(formData.get('discount_price')) : null,
             stock_quantity: parseInt(formData.get('stock_quantity')),
             short_description: formData.get('short_description'),
+            product_colour: formData.get('product_colour') || '',
+            box: formData.get('box') || 'without box',
+            box_price: formData.get('box_price') ? parseFloat(formData.get('box_price')) : 0,
             badge: formData.get('badge') || null,
             featured: formData.get('featured') === 'on'
         };
@@ -471,22 +530,23 @@ function initEditProductForm() {
             
             // Upload new image if selected
             const imageFile = imageInput ? imageInput.files[0] : null;
-            if (imageFile) {
-                const imageUrl = await appwriteDB.uploadImage(imageFile);
-                productData.product_image_url = imageUrl;
+            const uploadResult = await tryUploadProductImage(imageFile);
+            if (uploadResult.imageUrl) {
+                productData.product_image_url = uploadResult.imageUrl;
             }
             
             // Update product
             await appwriteDB.updateProduct(productId, productData);
             
-            showToast('Product updated successfully!', 'success');
+            if (uploadResult.skipped) {
+                showToast('Product updated, but image upload was skipped due to Appwrite permissions.', 'warning', 5000);
+            } else {
+                showToast('Product updated successfully!', 'success');
+            }
             if (imagePreview) imagePreview.innerHTML = '';
             
             // Reload data
-            loadDashboardStats();
-            loadRecentProducts();
-            loadAllProducts();
-            loadCategoryDistribution();
+            refreshAdminData(true);
             
             // Switch to products section
             showSection('products');
@@ -515,6 +575,9 @@ async function editProduct(id) {
         const discountField = document.getElementById('edit-discount-price');
         const stockField = document.getElementById('edit-stock-quantity');
         const descField = document.getElementById('edit-short-description');
+        const colourField = document.getElementById('edit-product-colour');
+        const boxField = document.getElementById('edit-box-option');
+        const boxPriceField = document.getElementById('edit-box-price');
         const badgeField = document.getElementById('edit-product-badge');
         const featuredField = document.getElementById('edit-featured');
         
@@ -525,6 +588,9 @@ async function editProduct(id) {
         if (discountField) discountField.value = product.discount_price || '';
         if (stockField) stockField.value = product.stock_quantity || '';
         if (descField) descField.value = product.short_description || '';
+        if (colourField) colourField.value = product.product_colour || '';
+        if (boxField) boxField.value = product.box || 'without box';
+        if (boxPriceField) boxPriceField.value = product.box_price || '';
         if (badgeField) badgeField.value = product.badge || '';
         if (featuredField) featuredField.checked = product.featured || false;
         
@@ -560,10 +626,7 @@ async function deleteProduct(id) {
         showToast('Product deleted successfully!', 'success');
         
         // Reload data
-        loadDashboardStats();
-        loadRecentProducts();
-        loadAllProducts();
-        loadCategoryDistribution();
+        refreshAdminData(true);
         
     } catch (error) {
         console.error('Error deleting product:', error);

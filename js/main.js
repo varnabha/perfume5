@@ -259,7 +259,7 @@ function createProductCard(product) {
     return `
         <div class="product-card" data-id="${product.id}">
             ${product.featured ? '<span class="product-badge featured">Featured</span>' : ''}
-            ${discount > 0 ? `<span class="product-badge">-${discount}%</span>` : ''}
+            ${discount > 0 ? `<span class="product-badge discount">-${discount}%</span>` : ''}
             
             <div class="product-image">
                 <img src="${product.product_image_url || 'assets/images/placeholder.svg'}" 
