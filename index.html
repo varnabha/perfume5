@@ -84,6 +84,10 @@
         </div>
         
         <div class="hero-content">
+            <div class="hero-brand-mark" data-animate="fade-up">
+                <span class="crown">♛</span>
+                <span class="brand-name">STOREIFY WATCHES</span>
+            </div>
             <span class="hero-label" data-animate="fade-up">Premium Collection</span>
             <h1 class="hero-title" data-animate="fade-up" data-delay="0.2">
                 Elevate Your Style With <span class="gold-text">Timeless Elegance</span>
@@ -104,6 +108,16 @@
             </div>
         </div>
         
+
+        <div class="hero-float-gallery" aria-hidden="true">
+            <div class="float-card watch-glow" data-animate="slide-left">
+                <img src="https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=700&q=80" alt="Premium black watch">
+            </div>
+            <div class="float-card perfume-glow" data-animate="slide-left" data-delay="0.15">
+                <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?w=700&q=80" alt="Luxury perfume bottle">
+            </div>
+        </div>
+
         <div class="scroll-indicator">
             <div class="mouse">
                 <div class="wheel"></div>
@@ -123,6 +137,13 @@
             <span>✦ Premium Quality Guaranteed</span>
             <span>✦ WhatsApp Ordering Available</span>
             <span>✦ Easy Returns Within 7 Days</span>
+        </div>
+    </div>
+
+    <div class="brand-marquee" aria-label="Big brands available">
+        <div class="brand-track">
+            <span>Rolex</span><span>Omega</span><span>Casio</span><span>Fossil</span><span>Titan</span><span>Tom Ford</span><span>Armani</span><span>Ray-Ban</span><span>Versace</span><span>Guess</span>
+            <span>Rolex</span><span>Omega</span><span>Casio</span><span>Fossil</span><span>Titan</span><span>Tom Ford</span><span>Armani</span><span>Ray-Ban</span><span>Versace</span><span>Guess</span>
         </div>
     </div>
 
@@ -313,6 +334,32 @@
                     <h3>Easy Returns</h3>
                     <p>Hassle-free 7-day return policy for your complete peace of mind.</p>
                 </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="dark-showcase" id="signature-showcase">
+        <div class="container">
+            <div class="section-header" data-animate="fade-up">
+                <span class="section-label">Signature Picks</span>
+                <h2 class="section-title">Black Dial Icons & Bold Perfumes</h2>
+            </div>
+            <div class="dark-showcase-grid">
+                <article class="dark-showcase-card" data-animate="slide-right">
+                    <img src="https://images.unsplash.com/photo-1434056886845-dac89ffe9b56?w=900&q=80" alt="Black luxury watch">
+                    <div class="dark-showcase-content">
+                        <h3>Midnight Chrono Collection</h3>
+                        <p>Statement black-dial watches with striking metal finishes for sharp evening looks.</p>
+                    </div>
+                </article>
+                <article class="dark-showcase-card" data-animate="slide-left" data-delay="0.15">
+                    <img src="https://images.unsplash.com/photo-1541643600914-78b084683601?w=900&q=80" alt="Luxury perfume collection">
+                    <div class="dark-showcase-content">
+                        <h3>Intense Perfume Vault</h3>
+                        <p>Rich, premium fragrances crafted to leave a memorable trail from day to night.</p>
+                    </div>
+                </article>
             </div>
         </div>
     </section>
@@ -849,6 +896,22 @@
                     trigger: '.style-moodboard',
                     start: 'top 80%'
                 }
+            });
+
+            gsap.to('.hero-float-gallery .float-card', {
+                y: -12,
+                repeat: -1,
+                yoyo: true,
+                duration: 2.8,
+                ease: 'sine.inOut',
+                stagger: 0.25
+            });
+
+            gsap.to('.brand-track', {
+                xPercent: -50,
+                repeat: -1,
+                duration: 18,
+                ease: 'none'
             });
 
             // Smooth scroll for anchor links
