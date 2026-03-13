@@ -151,7 +151,7 @@
         }
 
         // Load product details
-        async function loadProductDetails() {
+        async function loadProductDetails(forceRefresh = false) {
             const productId = getProductId();
             const container = document.getElementById('product-detail');
             
@@ -170,7 +170,9 @@
             showLoading(container, 'Loading product details...');
             
             try {
-                const product = await appwriteDB.getProductById(productId);
+                const product = forceRefresh
+                    ? await appwriteDB.getProductById(productId, { forceRefresh: true })
+                    : await appwriteDB.getProductById(productId);
                 
                 if (!product) {
                     container.innerHTML = `
@@ -191,7 +193,7 @@
                 
                 renderProductDetails(product);
                 updateBreadcrumb(product);
-                loadRelatedProducts(product);
+                loadRelatedProducts(product, forceRefresh);
                 
             } catch (error) {
                 console.error('Error loading product:', error);
@@ -322,13 +324,14 @@
         }
 
         // Load related products
-        async function loadRelatedProducts(currentProduct) {
+        async function loadRelatedProducts(currentProduct, forceRefresh = false) {
             const container = document.getElementById('related-products');
             
             try {
                 const products = await appwriteDB.getAllProducts({ 
                     category: currentProduct.category,
-                    limit: 4 
+                    limit: 4,
+                    forceRefresh
                 });
                 
                 // Filter out current product
@@ -353,6 +356,15 @@
         // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
             loadProductDetails();
+
+            const refreshProduct = () => loadProductDetails(true);
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) refreshProduct();
+            });
+            window.addEventListener('focus', refreshProduct);
+            window.addEventListener('storage', (event) => {
+                if (event.key === 'products_data_version') refreshProduct();
+            });
         });
     </script>
 </body>
