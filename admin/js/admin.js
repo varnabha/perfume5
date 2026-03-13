@@ -44,6 +44,32 @@ function initDashboard() {
     
     // Initialize search
     initProductSearch();
+
+    // Keep admin data fresh when tab regains focus or another tab updates products
+    initLiveRefresh();
+}
+
+function initLiveRefresh() {
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            refreshAdminData(true);
+        }
+    });
+
+    window.addEventListener('focus', () => refreshAdminData(true));
+
+    window.addEventListener('storage', (event) => {
+        if (event.key === 'products_data_version') {
+            refreshAdminData(true);
+        }
+    });
+}
+
+function refreshAdminData(forceRefresh = false) {
+    loadDashboardStats(forceRefresh);
+    loadRecentProducts(forceRefresh);
+    loadAllProducts(forceRefresh);
+    loadCategoryDistribution(forceRefresh);
 }
 
 // Navigation
@@ -103,9 +129,9 @@ function logout() {
 }
 
 // Load dashboard statistics
-async function loadDashboardStats() {
+async function loadDashboardStats(forceRefresh = false) {
     try {
-        const products = await appwriteDB.getAllProducts({ limit: 1000 });
+        const products = await appwriteDB.getAllProducts({ limit: 1000, forceRefresh });
         
         // Total products
         const totalProductsEl = document.getElementById('total-products');
@@ -133,9 +159,11 @@ async function loadDashboardStats() {
 }
 
 // Load category distribution
-async function loadCategoryDistribution() {
+async function loadCategoryDistribution(forceRefresh = false) {
     try {
-        const counts = await appwriteDB.getCategoryCounts();
+        const counts = forceRefresh
+            ? await appwriteDB.getCategoryCounts(true)
+            : await appwriteDB.getCategoryCounts();
         const container = document.getElementById('category-distribution');
         
         if (!container) return;
@@ -176,9 +204,9 @@ async function loadCategoryDistribution() {
 }
 
 // Load recent products
-async function loadRecentProducts() {
+async function loadRecentProducts(forceRefresh = false) {
     try {
-        const products = await appwriteDB.getAllProducts({ limit: 5 });
+        const products = await appwriteDB.getAllProducts({ limit: 5, forceRefresh });
         const tbody = document.getElementById('recent-products-table');
         
         if (!tbody) return;
@@ -228,9 +256,9 @@ let allProducts = [];
 let currentPage = 1;
 const productsPerPage = 10;
 
-async function loadAllProducts() {
+async function loadAllProducts(forceRefresh = false) {
     try {
-        const products = await appwriteDB.getAllProducts({ limit: 1000 });
+        const products = await appwriteDB.getAllProducts({ limit: 1000, forceRefresh });
         allProducts = products;
         renderProductsTable();
     } catch (error) {
@@ -412,10 +440,7 @@ function initAddProductForm() {
             if (imagePreview) imagePreview.innerHTML = '';
             
             // Reload data
-            loadDashboardStats();
-            loadRecentProducts();
-            loadAllProducts();
-            loadCategoryDistribution();
+            refreshAdminData(true);
             
             // Switch to products section
             showSection('products');
@@ -483,10 +508,7 @@ function initEditProductForm() {
             if (imagePreview) imagePreview.innerHTML = '';
             
             // Reload data
-            loadDashboardStats();
-            loadRecentProducts();
-            loadAllProducts();
-            loadCategoryDistribution();
+            refreshAdminData(true);
             
             // Switch to products section
             showSection('products');
@@ -560,10 +582,7 @@ async function deleteProduct(id) {
         showToast('Product deleted successfully!', 'success');
         
         // Reload data
-        loadDashboardStats();
-        loadRecentProducts();
-        loadAllProducts();
-        loadCategoryDistribution();
+        refreshAdminData(true);
         
     } catch (error) {
         console.error('Error deleting product:', error);
