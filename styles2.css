@@ -1803,3 +1803,170 @@ html {
 }
 
 .dark-showcase-content p { color: rgba(255,255,255,0.75); }
+
+/* ===== Mobile Optimization Pass ===== */
+@media (max-width: 900px) {
+    .video-hero {
+        min-height: 640px;
+        height: min(92vh, 760px);
+    }
+
+    .hero-content {
+        padding-top: 4.5rem;
+    }
+
+    .hero-title {
+        font-size: clamp(2rem, 8vw, 3.1rem);
+        line-height: 1.15;
+    }
+
+    .hero-description {
+        max-width: 92%;
+        font-size: 0.95rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .hero-buttons {
+        gap: 0.75rem;
+    }
+
+    .brand-marquee {
+        padding: 0.72rem 0;
+    }
+
+    .brand-track {
+        gap: 1.4rem;
+    }
+
+    .brand-track span {
+        letter-spacing: 1.2px;
+    }
+
+    .brand-track span::after {
+        margin-left: 1.4rem;
+    }
+
+    .trust-strip {
+        padding-top: 0.95rem;
+    }
+
+    .trust-strip-grid {
+        border-radius: var(--radius-lg);
+        padding: 0.9rem;
+        gap: 0.55rem;
+    }
+
+    .trust-pill {
+        padding: 0.85rem 0.7rem;
+    }
+
+    .trust-value {
+        font-size: 1.3rem;
+    }
+
+    .trust-label {
+        letter-spacing: 0.9px;
+        font-size: 0.67rem;
+    }
+
+    .style-moodboard {
+        padding: var(--space-2xl) 0 var(--space-lg);
+    }
+
+    .moodboard-grid {
+        gap: 0.9rem;
+    }
+
+    .dark-showcase {
+        padding: var(--space-3xl) 0;
+    }
+
+    .dark-showcase-card {
+        min-height: 330px;
+    }
+
+    .dark-showcase-content {
+        left: 1rem;
+        right: 1rem;
+        bottom: 1rem;
+    }
+
+    .dark-showcase-content h3 {
+        font-size: 1.18rem;
+        margin-bottom: 0.35rem;
+    }
+
+    .dark-showcase-content p {
+        font-size: 0.82rem;
+        line-height: 1.6;
+    }
+}
+
+@media (max-width: 560px) {
+    .hero-brand-mark {
+        padding: 0.35rem 0.75rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .hero-brand-mark .crown {
+        font-size: 0.85rem;
+    }
+
+    .hero-brand-mark .brand-name {
+        font-size: 0.6rem;
+        letter-spacing: 0.7px;
+    }
+
+    .hero-label {
+        letter-spacing: 2.2px;
+        margin-bottom: 1rem;
+    }
+
+    .hero-description {
+        font-size: 0.9rem;
+        line-height: 1.7;
+    }
+
+    .scroll-indicator {
+        bottom: 1.1rem;
+        font-size: 0.6rem;
+        gap: 0.45rem;
+    }
+
+    .mouse {
+        width: 22px;
+        height: 34px;
+    }
+
+    .trust-strip-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .brand-track span {
+        font-size: 0.68rem;
+    }
+
+    .moodboard-card,
+    .moodboard-card.large {
+        min-height: 220px;
+    }
+
+    .dark-showcase-card {
+        min-height: 285px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .aurora-orb,
+    .scroll-indicator,
+    .marquee-content,
+    .whatsapp-float {
+        animation: none !important;
+    }
+
+    .product-card,
+    .moodboard-card img,
+    .dark-showcase-card img {
+        transition: none !important;
+    }
+}
