@@ -34,8 +34,8 @@
             <ul class="nav-links" id="nav-links">
                 <li><a href="index.html" class="active">Home</a></li>
                 <li><a href="pages/products.html">Products</a></li>
-                <li><a href="pages/products.html?category=watches">Watches</a></li>
-                <li><a href="pages/products.html?category=perfumes">Perfumes</a></li>
+                <li><a href="pages/products.html?category=mens-watches">Men's Watches</a></li>
+                <li><a href="pages/products.html?category=sunglasses">Sunglasses</a></li>
                 <li><a href="#footer">Contact</a></li>
             </ul>
             
@@ -763,10 +763,11 @@
             <!-- Category Filters -->
             <div class="filter-tabs" data-animate="fade-up" data-delay="0.2" id="category-filters">
                 <button class="filter-tab active" data-filter="all">All</button>
-                <button class="filter-tab" data-filter="watches">Watches</button>
-                <button class="filter-tab" data-filter="perfumes">Perfumes</button>
+                <button class="filter-tab" data-filter="watches">All Watches</button>
+                <button class="filter-tab" data-filter="mens-watches">Men's Watches</button>
+                <button class="filter-tab" data-filter="female-watches">Female Watches</button>
+                <button class="filter-tab" data-filter="unisex-watches">Unisex Watches</button>
                 <button class="filter-tab" data-filter="sunglasses">Sunglasses</button>
-                <button class="filter-tab" data-filter="couple-accessories">Couple</button>
             </div>
             
             <div class="products-grid" id="products-grid">
@@ -1683,8 +1684,8 @@ document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
                     <ul>
                         <li><a href="index.html">Home</a></li>
                         <li><a href="pages/products.html">All Products</a></li>
-                        <li><a href="pages/products.html?category=perfumes">Perfumes</a></li>
-                        <li><a href="pages/products.html?category=watches">Watches</a></li>
+                        <li><a href="pages/products.html?category=mens-watches">Men's Watches</a></li>
+                        <li><a href="pages/products.html?category=sunglasses">Sunglasses</a></li>
                     </ul>
                 </div>
                 
@@ -2016,6 +2017,9 @@ document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
         function getCategoryImage(category) {
             const images = {
                 'watches': 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=600&q=80',
+                'mens-watches': 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=600&q=80',
+                'female-watches': 'https://images.unsplash.com/photo-1434056886845-dac89ffe9b56?w=600&q=80',
+                'unisex-watches': 'https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?w=600&q=80',
                 'perfumes': 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=600&q=80',
                 'sunglasses': 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&q=80',
                 'couple-accessories': 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&q=80',
