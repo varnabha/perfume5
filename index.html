@@ -34,8 +34,9 @@
             <ul class="nav-links" id="nav-links">
                 <li><a href="index.html" class="active">Home</a></li>
                 <li><a href="pages/products.html">Products</a></li>
-                <li><a href="pages/products.html?category=watches">Watches</a></li>
-                <li><a href="pages/products.html?category=perfumes">Perfumes</a></li>
+                <li><a href="pages/products.html?category=mens-watches">Men's Watches</a></li>
+                <li><a href="pages/products.html?category=female-watches">Female Watches</a></li>
+                <li><a href="pages/products.html?category=unisex-watches">Unisex Watches</a></li>
                 <li><a href="#footer">Contact</a></li>
             </ul>
             
@@ -71,6 +72,11 @@
 
     <!-- Video Hero Section -->
     <section class="video-hero" id="hero">
+        <div class="hero-aurora" aria-hidden="true">
+            <span class="aurora-orb orb-1"></span>
+            <span class="aurora-orb orb-2"></span>
+            <span class="aurora-orb orb-3"></span>
+        </div>
         <div class="video-container">
             <video autoplay loop muted playsinline>
                 <source src="https://assets.mixkit.co/videos/preview/mixkit-man-putting-on-a-luxury-watch-2953-large.mp4" type="video/mp4">
@@ -79,6 +85,10 @@
         </div>
         
         <div class="hero-content">
+            <div class="hero-brand-mark" data-animate="fade-up">
+                <span class="crown">♛</span>
+                <span class="brand-name">STOREIFY WATCHES</span>
+            </div>
             <span class="hero-label" data-animate="fade-up">Premium Collection</span>
             <h1 class="hero-title" data-animate="fade-up" data-delay="0.2">
                 Elevate Your Style With <span class="gold-text">Timeless Elegance</span>
@@ -93,12 +103,22 @@
                         <path d="M5 12h14M12 5l7 7-7 7"/>
                     </svg>
                 </a>
-                <a href="pages/products.html?category=watches" class="btn btn-outline-light">
+                <a href="pages/products.html?category=mens-watches" class="btn btn-outline-light">
                     <span>View Watches</span>
                 </a>
             </div>
         </div>
         
+
+        <div class="hero-float-gallery" aria-hidden="true">
+            <div class="float-card watch-glow" data-animate="slide-left">
+                <img src="https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=700&q=80" alt="Premium black watch">
+            </div>
+            <div class="float-card perfume-glow" data-animate="slide-left" data-delay="0.15">
+                <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?w=700&q=80" alt="Luxury perfume bottle">
+            </div>
+        </div>
+
         <div class="scroll-indicator">
             <div class="mouse">
                 <div class="wheel"></div>
@@ -120,6 +140,55 @@
             <span>✦ Easy Returns Within 7 Days</span>
         </div>
     </div>
+
+    <div class="brand-marquee" aria-label="Big brands available">
+        <div class="brand-track">
+            <span>Rolex</span><span>Omega</span><span>Casio</span><span>Fossil</span><span>Titan</span><span>Tom Ford</span><span>Armani</span><span>Ray-Ban</span><span>Versace</span><span>Guess</span>
+            <span>Rolex</span><span>Omega</span><span>Casio</span><span>Fossil</span><span>Titan</span><span>Tom Ford</span><span>Armani</span><span>Ray-Ban</span><span>Versace</span><span>Guess</span>
+        </div>
+    </div>
+
+    <section class="trust-strip" aria-label="Store highlights">
+        <div class="container">
+            <div class="trust-strip-grid" data-animate="fade-up">
+                <div class="trust-pill">
+                    <span class="trust-value">4.9/5</span>
+                    <span class="trust-label">Customer Rating</span>
+                </div>
+                <div class="trust-pill">
+                    <span class="trust-value">100%</span>
+                    <span class="trust-label">Authenticity Promise</span>
+                </div>
+                <div class="trust-pill">
+                    <span class="trust-value">24/7</span>
+                    <span class="trust-label">Premium Assistance</span>
+                </div>
+                <div class="trust-pill">
+                    <span class="trust-value">48h</span>
+                    <span class="trust-label">Priority Dispatch</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="style-moodboard" aria-label="Luxury style preview">
+        <div class="container">
+            <div class="moodboard-grid">
+                <div class="moodboard-card large" data-animate="slide-right">
+                    <img src="https://images.unsplash.com/photo-1509048191080-d2984bad6ae5?w=1200&q=80" alt="Luxury perfume and jewelry styling">
+                    <div class="moodboard-overlay"><span>Signature Perfume Notes</span></div>
+                </div>
+                <div class="moodboard-card" data-animate="fade-up" data-delay="0.1">
+                    <img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=900&q=80" alt="Premium watch close-up">
+                    <div class="moodboard-overlay"><span>Precision Crafted Timepieces</span></div>
+                </div>
+                <div class="moodboard-card" data-animate="fade-up" data-delay="0.2">
+                    <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348?w=900&q=80" alt="Designer sunglasses collection">
+                    <div class="moodboard-overlay"><span>Modern Luxury Eyewear</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Categories Section -->
     <section class="categories-section" id="categories">
@@ -147,11 +216,10 @@
             
             <!-- Category Filters -->
             <div class="filter-tabs" data-animate="fade-up" data-delay="0.2" id="category-filters">
-                <button class="filter-tab active" data-filter="all">All</button>
-                <button class="filter-tab" data-filter="watches">Watches</button>
-                <button class="filter-tab" data-filter="perfumes">Perfumes</button>
-                <button class="filter-tab" data-filter="sunglasses">Sunglasses</button>
-                <button class="filter-tab" data-filter="couple-accessories">Couple</button>
+                <button class="filter-tab active" data-filter="all">All Watches</button>
+                <button class="filter-tab" data-filter="mens-watches">Men's Watches</button>
+                <button class="filter-tab" data-filter="female-watches">Female Watches</button>
+                <button class="filter-tab" data-filter="unisex-watches">Unisex Watches</button>
             </div>
             
             <div class="products-grid" id="products-grid">
@@ -270,6 +338,32 @@
         </div>
     </section>
 
+
+    <section class="dark-showcase" id="signature-showcase">
+        <div class="container">
+            <div class="section-header" data-animate="fade-up">
+                <span class="section-label">Signature Picks</span>
+                <h2 class="section-title">Black Dial Icons & Bold Perfumes</h2>
+            </div>
+            <div class="dark-showcase-grid">
+                <article class="dark-showcase-card" data-animate="slide-right">
+                    <img src="https://images.unsplash.com/photo-1434056886845-dac89ffe9b56?w=900&q=80" alt="Black luxury watch">
+                    <div class="dark-showcase-content">
+                        <h3>Midnight Chrono Collection</h3>
+                        <p>Statement black-dial watches with striking metal finishes for sharp evening looks.</p>
+                    </div>
+                </article>
+                <article class="dark-showcase-card" data-animate="slide-left" data-delay="0.15">
+                    <img src="https://images.unsplash.com/photo-1541643600914-78b084683601?w=900&q=80" alt="Luxury perfume collection">
+                    <div class="dark-showcase-content">
+                        <h3>Intense Perfume Vault</h3>
+                        <p>Rich, premium fragrances crafted to leave a memorable trail from day to night.</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
     <!-- CTA Section -->
     <section class="cta-section" id="cta">
         <div class="cta-background">
@@ -333,18 +427,19 @@
                         <ul>
                             <li><a href="index.html">Home</a></li>
                             <li><a href="pages/products.html">All Products</a></li>
-                            <li><a href="pages/products.html?category=watches">Watches</a></li>
-                            <li><a href="pages/products.html?category=perfumes">Perfumes</a></li>
+                            <li><a href="pages/products.html?category=mens-watches">Men's Watches</a></li>
+                            <li><a href="pages/products.html?category=female-watches">Female Watches</a></li>
+                            <li><a href="pages/products.html?category=unisex-watches">Unisex Watches</a></li>
                         </ul>
                     </div>
                     
                     <div class="footer-links">
                         <h4>Categories</h4>
                         <ul>
-                            <li><a href="pages/products.html?category=sunglasses">Sunglasses</a></li>
-                            <li><a href="pages/products.html?category=couple-accessories">Couple Accessories</a></li>
-                            <li><a href="pages/products.html?category=lifestyle">Lifestyle</a></li>
-                            <li><a href="pages/products.html?featured=true">Featured</a></li>
+                            <li><a href="pages/products.html?category=mens-watches">Men's Watches</a></li>
+                            <li><a href="pages/products.html?category=female-watches">Female Watches</a></li>
+                            <li><a href="pages/products.html?category=unisex-watches">Unisex Watches</a></li>
+                            <li><a href="pages/products.html?featured=true">Featured Watches</a></li>
                         </ul>
                     </div>
                     
@@ -422,13 +517,19 @@
         // Helper function to get category images
         function getCategoryImage(category) {
             const images = {
-                'watches': 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=600&q=80',
-                'perfumes': 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=600&q=80',
-                'sunglasses': 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&q=80',
-                'couple-accessories': 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&q=80',
-                'lifestyle': 'https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=600&q=80'
+                'mens-watches': 'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?w=600&q=80',
+                'female-watches': 'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=600&q=80',
+                'unisex-watches': 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=600&q=80'
             };
-            return images[category] || images['watches'];
+            return images[category] || images['mens-watches'];
+        }
+
+        function getWatchCategoryCount(counts) {
+            return counts.watches || counts['mens-watches'] || counts['female-watches'] || counts['unisex-watches'] || 0;
+        }
+
+        function isWatchFilter(category) {
+            return ['mens-watches', 'female-watches', 'unisex-watches'].includes(category);
         }
 
         // Load categories from Supabase
@@ -447,7 +548,7 @@
                         <div class="category-content">
                             <div class="category-icon">${getCategoryIcon(cat.icon)}</div>
                             <h3>${cat.name}</h3>
-                            <p>${counts[cat.id] || 0} products</p>
+                            <p>${isWatchFilter(cat.id) ? getWatchCategoryCount(counts) : (counts[cat.id] || 0)} products</p>
                             <span class="category-arrow">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -609,7 +710,9 @@
             const container = document.getElementById('products-grid');
             
             if (currentCategory === 'all') {
-                filteredProducts = allProducts;
+                filteredProducts = allProducts.filter(p => p.category === 'watches');
+            } else if (isWatchFilter(currentCategory)) {
+                filteredProducts = allProducts.filter(p => p.category === 'watches');
             } else {
                 filteredProducts = allProducts.filter(p => p.category === currentCategory);
             }
@@ -775,6 +878,51 @@
                 }
             });
 
+            gsap.to('.hero-aurora .orb-1', {
+                x: 40,
+                y: -30,
+                duration: 10,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+
+            gsap.to('.hero-aurora .orb-2', {
+                x: -35,
+                y: 25,
+                duration: 12,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+
+            gsap.to('.moodboard-card', {
+                y: -20,
+                stagger: 0.12,
+                duration: 1.2,
+                ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: '.style-moodboard',
+                    start: 'top 80%'
+                }
+            });
+
+            gsap.to('.hero-float-gallery .float-card', {
+                y: -12,
+                repeat: -1,
+                yoyo: true,
+                duration: 2.8,
+                ease: 'sine.inOut',
+                stagger: 0.25
+            });
+
+            gsap.to('.brand-track', {
+                xPercent: -50,
+                repeat: -1,
+                duration: 18,
+                ease: 'none'
+            });
+
             // Smooth scroll for anchor links
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function(e) {
@@ -840,7 +988,7 @@
                     `<div class="category-card reveal" style="transition-delay: ${index * 0.1}s" data-category="${cat.id}">
                         <div class="category-icon">${getCategoryIcon(cat.icon)}</div>
                         <h3>${cat.name}</h3>
-                        <p>${counts[cat.id] || 0} products</p>
+                        <p>${isWatchFilter(cat.id) ? getWatchCategoryCount(counts) : (counts[cat.id] || 0)} products</p>
                     </div>`
                 ).join('');
                 
@@ -901,7 +1049,9 @@
             const container = document.getElementById('all-products-grid');
             
             if (currentCategory === 'all') {
-                filteredProducts = allProducts;
+                filteredProducts = allProducts.filter(p => p.category === 'watches');
+            } else if (isWatchFilter(currentCategory)) {
+                filteredProducts = allProducts.filter(p => p.category === 'watches');
             } else {
                 filteredProducts = allProducts.filter(p => p.category === currentCategory);
             }

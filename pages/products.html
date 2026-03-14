@@ -29,8 +29,9 @@
             <ul class="nav-links">
                 <li><a href="../index.html">Home</a></li>
                 <li><a href="products.html" class="active">Products</a></li>
-                <li><a href="products.html?category=watches">Watches</a></li>
-                <li><a href="products.html?category=perfumes">Perfumes</a></li>
+                <li><a href="products.html?category=mens-watches">Men's Watches</a></li>
+                <li><a href="products.html?category=female-watches">Female Watches</a></li>
+                <li><a href="products.html?category=unisex-watches">Unisex Watches</a></li>
                 <li><a href="../index.html#footer">Contact</a></li>
             </ul>
             
@@ -63,12 +64,10 @@
             
             <!-- Category Filters -->
             <div class="products-filter" id="category-filters">
-                <button class="filter-btn active" data-category="all">All</button>
-                <button class="filter-btn" data-category="watches">Watches</button>
-                <button class="filter-btn" data-category="perfumes">Perfumes</button>
-                <button class="filter-btn" data-category="sunglasses">Sunglasses</button>
-                <button class="filter-btn" data-category="couple-accessories">Couple Accessories</button>
-                <button class="filter-btn" data-category="lifestyle">Lifestyle</button>
+                <button class="filter-btn active" data-category="all">All Watches</button>
+                <button class="filter-btn" data-category="mens-watches">Men's Watches</button>
+                <button class="filter-btn" data-category="female-watches">Female Watches</button>
+                <button class="filter-btn" data-category="unisex-watches">Unisex Watches</button>
             </div>
             
             <!-- Results Count -->
@@ -102,8 +101,9 @@
                     <ul>
                         <li><a href="../index.html">Home</a></li>
                         <li><a href="products.html">Products</a></li>
-                        <li><a href="products.html?category=watches">Watches</a></li>
-                        <li><a href="products.html?category=perfumes">Perfumes</a></li>
+                        <li><a href="products.html?category=mens-watches">Men's Watches</a></li>
+                        <li><a href="products.html?category=female-watches">Female Watches</a></li>
+                        <li><a href="products.html?category=unisex-watches">Unisex Watches</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
@@ -128,6 +128,13 @@
         let currentCategory = 'all';
         let allProducts = [];
         let filteredProducts = [];
+
+        const watchCategories = ['mens-watches', 'female-watches', 'unisex-watches'];
+
+        function normalizeCategory(category) {
+            return watchCategories.includes(category) ? 'watches' : category;
+        }
+
 
         // Get URL parameters
         function getUrlParams() {
@@ -178,7 +185,7 @@
                     products = await appwriteDB.getFeaturedProducts(100, { forceRefresh });
                 } else {
                     products = await appwriteDB.getAllProducts({ 
-                        category: params.category,
+                        category: normalizeCategory(params.category),
                         limit: 100,
                         forceRefresh
                     });

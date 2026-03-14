@@ -48,12 +48,9 @@ const CONFIG = {
     
     // Categories
     categories: [
-        { id: 'all', name: 'All Products', icon: 'grid' },
-        { id: 'watches', name: 'Watches', icon: 'watch' },
-        { id: 'perfumes', name: 'Perfumes', icon: 'droplet' },
-        { id: 'sunglasses', name: 'Sunglasses', icon: 'sun' },
-        { id: 'couple-accessories', name: 'Couple Accessories', icon: 'heart' },
-        { id: 'lifestyle', name: 'Lifestyle', icon: 'star' }
+        { id: 'mens-watches', name: "Men's Watches", icon: 'watch' },
+        { id: 'female-watches', name: "Female Watches", icon: 'watch' },
+        { id: 'unisex-watches', name: 'Unisex Watches', icon: 'watch' }
     ],
     
     // Theme Colors
