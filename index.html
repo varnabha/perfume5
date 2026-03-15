@@ -719,17 +719,13 @@
 
     <section class="style-moodboard" aria-label="Luxury style preview">
         <div class="container">
-            <div class="moodboard-grid">
-                <div class="moodboard-card large" data-animate="slide-right">
-                    <img src="https://images.unsplash.com/photo-1509048191080-d2984bad6ae5?w=1200&q=80" alt="Luxury perfume and jewelry styling">
-                    <div class="moodboard-overlay"><span>Signature Perfume Notes</span></div>
-                </div>
+            
                 <div class="moodboard-card" data-animate="fade-up" data-delay="0.1">
-                    <img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=900&q=80" alt="Premium watch close-up">
+                    <img src="rolex2.jpeg" alt="Premium watch close-up">
                     <div class="moodboard-overlay"><span>Precision Crafted Timepieces</span></div>
                 </div>
                 <div class="moodboard-card" data-animate="fade-up" data-delay="0.2">
-                    <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348?w=900&q=80" alt="Designer sunglasses collection">
+                    <img src="sunglasses.jpeg" alt="Designer sunglasses collection">
                     <div class="moodboard-overlay"><span>Modern Luxury Eyewear</span></div>
                 </div>
             </div>
@@ -1278,7 +1274,7 @@ document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
     <section class="experience-section" id="experience">
         <div class="experience-grid">
             <div class="experience-image" data-animate="slide-right">
-                <img src="https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=800&q=80" alt="Luxury Watch Experience">
+                <img src="rolex3.jpeg" alt="Luxury Watch Experience">
                 <div class="floating-card">
                     <span class="floating-number">10+</span>
                     <span class="floating-text">Years of Excellence</span>
@@ -1316,7 +1312,7 @@ document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
      Place between Experience and Features
      ============================================ -->
 <section class="parallax-showcase" id="showcase">
-    <div class="showcase-bg" style="background-image: url('https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?w=1600&q=80')"></div>
+    <img class="showcase-bg" src="low.jpeg" alt="Showcase Background">
     <div class="showcase-overlay"></div>
     
     <div class="container">
@@ -2016,12 +2012,12 @@ document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
         function getCategoryImage(category) {
             const images = {
                 'watches': 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=600&q=80',
-                'mens-watches': 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=600&q=80',
-                'female-watches': 'https://images.unsplash.com/photo-1434056886845-dac89ffe9b56?w=600&q=80',
+                'mens-watches': 'menw.jpeg',
+                'female-watches': 'womenw.jpeg',
                 'unisex-watches': 'unisex.jpeg',
                                 'sunglasses': 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&q=80',
-                'couple-accessories': 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&q=80',
-                'lifestyle': 'https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=600&q=80'
+                'couple-accessories': 'couplew.jpeg',
+            //    'lifestyle': 'https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=600&q=80'
             };
             return images[category] || images['watches'];
         }
