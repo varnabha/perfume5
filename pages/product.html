@@ -40,6 +40,26 @@
             padding-top: 4rem;
             border-top: 1px solid var(--border);
         }
+
+        .product-thumbnails {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.75rem;
+        }
+
+        .product-thumbnails img {
+            width: 64px;
+            height: 64px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .product-thumbnails img.active {
+            border-color: var(--accent);
+        }
     </style>
 </head>
 <body>
@@ -242,11 +262,20 @@
                 stockClass = 'in';
             }
             
+            const productImages = Array.isArray(product.product_image_urls) && product.product_image_urls.length > 0
+                ? product.product_image_urls
+                : (product.product_image_url ? [product.product_image_url] : ['../assets/images/placeholder.jpg']);
+
             container.innerHTML = `
                 <div class="product-detail-image">
-                    <img src="${product.product_image_url || '../assets/images/placeholder.jpg'}" 
+                    <img id="main-product-image" src="${productImages[0]}" 
                          alt="${product.product_name}"
                          onerror="this.src='../assets/images/placeholder.jpg'">
+                    ${productImages.length > 1 ? `
+                        <div class="product-thumbnails" id="product-thumbnails">
+                            ${productImages.map((url, index) => `<img src="${url}" data-image="${url}" class="${index === 0 ? 'active' : ''}" alt="${product.product_name} ${index + 1}">`).join('')}
+                        </div>
+                    ` : ''}
                 </div>
                 
                 <div class="product-detail-info">
@@ -322,6 +351,18 @@
                 </div>
             `;
             
+            const mainProductImage = document.getElementById('main-product-image');
+            const thumbContainer = document.getElementById('product-thumbnails');
+            if (mainProductImage && thumbContainer) {
+                thumbContainer.addEventListener('click', (event) => {
+                    const img = event.target.closest('img[data-image]');
+                    if (!img) return;
+                    mainProductImage.src = img.dataset.image;
+                    thumbContainer.querySelectorAll('img').forEach((el) => el.classList.remove('active'));
+                    img.classList.add('active');
+                });
+            }
+
             // Add color selection handlers
             if (hasColors) {
                 document.querySelectorAll('.color-option').forEach(option => {

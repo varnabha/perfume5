@@ -566,6 +566,43 @@ class AppwriteDB {
 
     // ===== Storage Operations =====
 
+    extractFileIdFromUrl(fileUrl) {
+        const value = String(fileUrl || '');
+        const match = value.match(/\/files\/([^/]+)\/view/i);
+        return match ? match[1] : null;
+    }
+
+    async deleteImageByUrl(fileUrl) {
+        const fileId = this.extractFileIdFromUrl(fileUrl);
+        if (!fileId) return false;
+
+        try {
+            const url = this.buildStorageUrl(`/files/${fileId}`);
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'X-Appwrite-Project': this.projectId,
+                    'X-Appwrite-Key': this.apiKey
+                }
+            });
+
+            if (!response.ok && response.status !== 404) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `Delete failed: ${response.statusText}`);
+            }
+
+            return true;
+        } catch (error) {
+            console.warn('Error deleting image:', error);
+            return false;
+        }
+    }
+
+    async deleteImagesByUrls(urls = []) {
+        if (!Array.isArray(urls) || urls.length === 0) return;
+        await Promise.all(urls.map((url) => this.deleteImageByUrl(url)));
+    }
+
     // Upload image to Appwrite Storage
     async uploadImage(file, folder = 'product-images') {
         try {
@@ -669,6 +706,9 @@ class AppwriteDB {
 formatDocument(doc) {
     if (!doc) return null;
     
+    const productImageUrls = Array.isArray(doc.product_image_urls) ? doc.product_image_urls.filter(Boolean) : [];
+    const primaryImage = productImageUrls[0] || doc.product_image_url || 'https://via.placeholder.com/300x300?text=No+Image';
+
     return {
         $id: doc.$id,
         id: doc.$id,
@@ -683,8 +723,9 @@ formatDocument(doc) {
         category: doc.category || 'uncategorized',
         category_name: doc.category || 'uncategorized',
         // THIS LINE IS THE FIX - replaces missing images automatically
-        product_image_url: doc.product_image_url || 'https://via.placeholder.com/300x300?text=No+Image',
-        image: doc.product_image_url || 'https://via.placeholder.com/300x300?text=No+Image',
+        product_image_url: primaryImage,
+        product_image_urls: productImageUrls.length > 0 ? productImageUrls : (doc.product_image_url ? [doc.product_image_url] : []),
+        image: primaryImage,
         stock_quantity: doc.stock_quantity || 0,
         stock: doc.stock_quantity || 0,
         colour_options: doc.colour_options || [],
@@ -719,6 +760,7 @@ formatDocument(doc) {
         if (data.stock_quantity !== undefined) formatted.stock_quantity = data.stock_quantity;
         if (data.short_description !== undefined) formatted.short_description = data.short_description;
         if (data.product_image_url !== undefined) formatted.product_image_url = data.product_image_url;
+        if (data.product_image_urls !== undefined) formatted.product_image_urls = data.product_image_urls;
         if (data.colour_options !== undefined) formatted.colour_options = data.colour_options;
         if (data.product_tags !== undefined) formatted.product_tags = data.product_tags;
         if (data.featured !== undefined) formatted.featured = data.featured;

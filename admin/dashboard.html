@@ -302,8 +302,9 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="product-image">Product Image</label>
-                            <input type="file" id="product-image" name="image" accept="image/*">
+                            <label for="product-image">Product Images (up to 5)</label>
+                            <input type="file" id="product-image" name="image" accept="image/*" multiple>
+                            <small>Select up to 5 images. The first image is used as the main image.</small>
                             <div id="image-preview" class="image-preview"></div>
                         </div>
                         
@@ -421,10 +422,11 @@
                         </div>
                         
                         <div class="form-group">
-                            <label>Current Image</label>
+                            <label>Current Images</label>
                             <div id="edit-current-image" class="current-image"></div>
-                            <label for="edit-product-image" class="mt-2">Change Image</label>
-                            <input type="file" id="edit-product-image" name="image" accept="image/*">
+                            <label for="edit-product-image" class="mt-2">Change Images (up to 5)</label>
+                            <input type="file" id="edit-product-image" name="image" accept="image/*" multiple>
+                            <small>Select up to 5 images. The first image is used as the main image.</small>
                             <div id="edit-image-preview" class="image-preview"></div>
                         </div>
                         

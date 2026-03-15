@@ -249,6 +249,20 @@ function initScrollReveal() {
     revealOnScroll(); // Trigger on load
 }
 
+
+function getProductPrimaryImage(product) {
+    const imageList = Array.isArray(product?.product_image_urls)
+        ? product.product_image_urls.filter(Boolean)
+        : [];
+    return imageList[0] || product.product_image_url || 'assets/images/placeholder.svg';
+}
+
+function getProductDetailsUrl(productId) {
+    const isInsidePagesDir = window.location.pathname.includes('/pages/');
+    const prefix = isInsidePagesDir ? '' : 'pages/';
+    return `${prefix}product.html?id=${productId}`;
+}
+
 // ===== Product Card Generator =====
 
 function createProductCard(product) {
@@ -262,7 +276,7 @@ function createProductCard(product) {
             ${discount > 0 ? `<span class="product-badge discount">-${discount}%</span>` : ''}
             
             <div class="product-image">
-                <img src="${product.product_image_url || 'assets/images/placeholder.svg'}" 
+                <img src="${getProductPrimaryImage(product)}" 
                      alt="${product.product_name}" 
                      loading="lazy"
                      onerror="this.src='assets/images/placeholder.svg'">
@@ -288,7 +302,7 @@ function createProductCard(product) {
                 </div>
                 
                 <div class="product-actions">
-                    <a href="pages/product.html?id=${product.id}" class="btn btn-outline btn-sm">View Details</a>
+                    <a href="${getProductDetailsUrl(product.id)}" class="btn btn-outline btn-sm">View Details</a>
                     <a href="${generateWhatsAppLink(product)}" target="_blank" class="btn btn-accent btn-sm">Book Now</a>
                 </div>
             </div>
