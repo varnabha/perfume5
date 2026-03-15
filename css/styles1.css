@@ -795,3 +795,10 @@ body {
     opacity: 1;
     transform: translateY(0);
 }
+
+
+.discount-percent-text {
+    color: #dc2626;
+    font-size: 0.82rem;
+    font-weight: 700;
+}

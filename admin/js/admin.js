@@ -176,11 +176,12 @@ async function loadCategoryDistribution(forceRefresh = false) {
         }
         
         const categoryNames = {
-            'watches': 'Watches',
-            'perfumes': 'Perfumes',
+            'watches': 'All Watches',
+            'mens-watches': "Men's Watches",
+            'female-watches': 'Female Watches',
+            'unisex-watches': 'Unisex Watches',
             'sunglasses': 'Sunglasses',
-            'couple-accessories': 'Couple Accessories',
-            'lifestyle': 'Lifestyle'
+            'couple-accessories': 'Couple Watches'
         };
         
         container.innerHTML = Object.entries(counts)
