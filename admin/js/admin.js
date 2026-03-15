@@ -176,11 +176,12 @@ async function loadCategoryDistribution(forceRefresh = false) {
         }
         
         const categoryNames = {
-            'watches': 'Watches',
-            'perfumes': 'Perfumes',
+            'watches': 'All Watches',
+            'mens-watches': "Men's Watches",
+            'female-watches': 'Female Watches',
+            'unisex-watches': 'Unisex Watches',
             'sunglasses': 'Sunglasses',
-            'couple-accessories': 'Couple Accessories',
-            'lifestyle': 'Lifestyle'
+            'couple-accessories': 'Couple Watches'
         };
         
         container.innerHTML = Object.entries(counts)
@@ -220,7 +221,7 @@ async function loadRecentProducts(forceRefresh = false) {
             <tr>
                 <td>
                     <div class="product-cell">
-                        <img src="${product.product_image_url || '../assets/images/placeholder.jpg'}" 
+                        <img src="${getPrimaryProductImage(product)}" 
                              alt="${product.product_name}"
                              onerror="this.src='../assets/images/placeholder.jpg'">
                         <span class="product-name">${product.product_name}</span>
@@ -296,7 +297,7 @@ function renderProductsTable() {
             <tr>
                 <td>
                     <div class="product-cell">
-                        <img src="${product.product_image_url || '../assets/images/placeholder.jpg'}" 
+                        <img src="${getPrimaryProductImage(product)}" 
                              alt="${product.product_name}"
                              onerror="this.src='../assets/images/placeholder.jpg'">
                         <span class="product-name">${product.product_name}</span>
@@ -372,6 +373,49 @@ function getStockBadgeClass(stock) {
     if (stock < 10) return 'badge-warning';
     return 'badge-success';
 }
+
+
+function getProductImages(product) {
+    if (Array.isArray(product?.product_image_urls) && product.product_image_urls.length > 0) {
+        return product.product_image_urls.filter(Boolean);
+    }
+    if (product?.product_image_url) return [product.product_image_url];
+    return [];
+}
+
+function getPrimaryProductImage(product) {
+    return getProductImages(product)[0] || '../assets/images/placeholder.jpg';
+}
+
+function renderImagePreviewFiles(previewEl, files = []) {
+    if (!previewEl) return;
+    if (!files.length) {
+        previewEl.innerHTML = '';
+        return;
+    }
+
+    previewEl.innerHTML = files.map((file) => {
+        const url = URL.createObjectURL(file);
+        return `<img src="${url}" alt="Preview" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-right: 8px;">`;
+    }).join('');
+}
+
+async function uploadProductImages(imageFiles = []) {
+    const files = Array.from(imageFiles || []).slice(0, 5);
+    if (files.length === 0) return { imageUrls: [], skipped: false };
+
+    const uploaded = [];
+    let skipped = false;
+
+    for (const file of files) {
+        const uploadResult = await tryUploadProductImage(file);
+        if (uploadResult.imageUrl) uploaded.push(uploadResult.imageUrl);
+        if (uploadResult.skipped) skipped = true;
+    }
+
+    return { imageUrls: uploaded, skipped };
+}
+
 
 // Initialize product search
 function initProductSearch() {
@@ -510,14 +554,8 @@ function initAddProductForm() {
     // Image preview
     if (imageInput && imagePreview) {
         imageInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
-                };
-                reader.readAsDataURL(file);
-            }
+            const files = Array.from(e.target.files || []).slice(0, 5);
+            renderImagePreviewFiles(imagePreview, files);
         });
     }
     
@@ -548,13 +586,14 @@ function initAddProductForm() {
         try {
             showToast('Adding product...', 'info');
             
-            // Upload image if selected
-            const imageFile = imageInput ? imageInput.files[0] : null;
-            const uploadResult = await tryUploadProductImage(imageFile);
-            if (uploadResult.imageUrl) {
-                productData.product_image_url = uploadResult.imageUrl;
+            // Upload images if selected (up to 5)
+            const imageFiles = imageInput ? imageInput.files : [];
+            const uploadResult = await uploadProductImages(imageFiles);
+            if (uploadResult.imageUrls.length > 0) {
+                productData.product_image_urls = uploadResult.imageUrls;
+                productData.product_image_url = uploadResult.imageUrls[0];
             }
-            
+
             // Add product
             await appwriteDB.addProduct(productData);
             
@@ -600,14 +639,8 @@ function initEditProductForm() {
     // Image preview
     if (imageInput && imagePreview) {
         imageInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
-                };
-                reader.readAsDataURL(file);
-            }
+            const files = Array.from(e.target.files || []).slice(0, 5);
+            renderImagePreviewFiles(imagePreview, files);
         });
     }
     
@@ -639,15 +672,25 @@ function initEditProductForm() {
         try {
             showToast('Updating product...', 'info');
             
-            // Upload new image if selected
-            const imageFile = imageInput ? imageInput.files[0] : null;
-            const uploadResult = await tryUploadProductImage(imageFile);
-            if (uploadResult.imageUrl) {
-                productData.product_image_url = uploadResult.imageUrl;
+            const existingProduct = await appwriteDB.getProductById(productId);
+            const existingImages = getProductImages(existingProduct);
+
+            // Upload new images if selected (up to 5)
+            const imageFiles = imageInput ? imageInput.files : [];
+            const uploadResult = await uploadProductImages(imageFiles);
+            if (uploadResult.imageUrls.length > 0) {
+                productData.product_image_urls = uploadResult.imageUrls;
+                productData.product_image_url = uploadResult.imageUrls[0];
             }
-            
+
             // Update product
-            await appwriteDB.updateProduct(productId, productData);
+            const updatedProduct = await appwriteDB.updateProduct(productId, productData);
+
+            if (uploadResult.imageUrls.length > 0) {
+                const nextImages = getProductImages(updatedProduct);
+                const imagesToDelete = existingImages.filter((url) => !nextImages.includes(url));
+                await appwriteDB.deleteImagesByUrls(imagesToDelete);
+            }
             
             if (uploadResult.skipped) {
                 showToast('Product updated, but image upload was skipped due to Appwrite permissions.', 'warning', 5000);
@@ -705,11 +748,12 @@ async function editProduct(id) {
         if (badgeField) badgeField.value = product.badge || '';
         if (featuredField) featuredField.checked = product.featured || false;
         
-        // Show current image
+        // Show current images
         const currentImageDiv = document.getElementById('edit-current-image');
         if (currentImageDiv) {
-            if (product.product_image_url) {
-                currentImageDiv.innerHTML = `<img src="${product.product_image_url}" alt="Current">`;
+            const currentImages = getProductImages(product);
+            if (currentImages.length > 0) {
+                currentImageDiv.innerHTML = currentImages.map((url) => `<img src="${url}" alt="Current" style="width: 72px; height: 72px; object-fit: cover; border-radius: 8px; margin-right: 8px;">`).join('');
             } else {
                 currentImageDiv.innerHTML = '<p>No image</p>';
             }
@@ -732,7 +776,10 @@ async function deleteProduct(id) {
     
     try {
         showToast('Deleting product...', 'info');
+        const product = await appwriteDB.getProductById(id);
+        const images = getProductImages(product);
         await appwriteDB.deleteProduct(id);
+        await appwriteDB.deleteImagesByUrls(images);
         
         showToast('Product deleted successfully!', 'success');
         

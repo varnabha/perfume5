@@ -5,7 +5,7 @@ const CONFIG = {
     // Store Information
     storeName: 'Storeify Watches',
     storeTagline: 'Premium Lifestyle Accessories',
-    storeDescription: 'Discover our curated collection of premium watches, perfumes, sunglasses, and couple accessories.',
+    storeDescription: 'Discover our curated collection of premium watches, sunglasses, and couple watches.',
     
     // WhatsApp Configuration
     whatsapp: {
@@ -49,14 +49,12 @@ const CONFIG = {
     // Categories
     categories: [
         { id: 'all', name: 'All Products', icon: 'grid' },
-        { id: 'watches', name: 'Watches', icon: 'watch' },
-        { id: 'perfumes', name: 'Perfumes', icon: 'droplet' },
-        { id: 'sunglasses', name: 'Sunglasses', icon: 'sun' },
-        { id: 'couple-accessories', name: 'Couple Accessories', icon: 'heart' },
-        { id: 'lifestyle', name: 'Lifestyle', icon: 'star' }
+        { id: 'watches', name: 'All Watches', icon: 'watch' },
         { id: 'mens-watches', name: "Men's Watches", icon: 'watch' },
-        { id: 'female-watches', name: "Female Watches", icon: 'watch' },
-        { id: 'unisex-watches', name: 'Unisex Watches', icon: 'watch' }
+        { id: 'female-watches', name: 'Female Watches', icon: 'watch' },
+        { id: 'unisex-watches', name: 'Unisex Watches', icon: 'watch' },
+        { id: 'sunglasses', name: 'Sunglasses', icon: 'sun' },
+        { id: 'couple-accessories', name: 'Couple Watches', icon: 'heart' }
     ],
     
     // Theme Colors
@@ -74,8 +72,8 @@ const CONFIG = {
     
     // Social Links
     social: {
-        instagram: 'https://instagram.com/storeifywatches',
-        facebook: 'https://facebook.com/storeifywatches',
+        instagram: 'https://www.instagram.com/storeify.watches?igsh=MTJ6bXgzNzRwdGdkag==',
+        facebook: 'https://www.facebook.com/share/1EU6x2EHDr/?mibextid=wwXIfr',
         twitter: 'https://twitter.com/storeifywatches',
         whatsapp: 'https://wa.me/919876543210'
     },

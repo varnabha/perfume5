@@ -1574,20 +1574,21 @@ html {
 
 .moodboard-grid {
     display: grid;
-    grid-template-columns: 1.25fr 1fr 1fr;
+    grid-template-columns: 1.15fr 0.9fr 0.9fr;
     gap: 1.25rem;
+    padding: 0 1rem;
 }
 
 .moodboard-card {
     position: relative;
     overflow: hidden;
     border-radius: var(--radius-lg);
-    min-height: 250px;
+    min-height: 210px;
     box-shadow: var(--shadow-md);
 }
 
 .moodboard-card.large {
-    min-height: 520px;
+    min-height: 420px;
 }
 
 .moodboard-card img {
@@ -1969,4 +1970,11 @@ html {
     .dark-showcase-card img {
         transition: none !important;
     }
+}
+
+
+.discount-percent-text {
+    color: #dc2626;
+    font-size: 0.82rem;
+    font-weight: 700;
 }
