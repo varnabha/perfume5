@@ -1970,3 +1970,10 @@ html {
         transition: none !important;
     }
 }
+
+
+.discount-percent-text {
+    color: #dc2626;
+    font-size: 0.82rem;
+    font-weight: 700;
+}

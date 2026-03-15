@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Storeify Watches - Premium Lifestyle Accessories</title>
-    <meta name="description" content="Discover our curated collection of premium watches, perfumes, sunglasses, and couple accessories at Storeify Watches.">
+    <meta name="description" content="Discover our curated collection of premium watches, sunglasses, and couple watches at Storeify Watches.">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -86,7 +86,7 @@
             Elevate Your Style With <span class="gold-text">Timeless Elegance</span>
         </h1>
         <p class="hero-description">
-            Discover our curated collection of luxury watches, exquisite perfumes, designer sunglasses, and exclusive couple accessories.
+            Discover our curated collection of luxury watches, designer sunglasses, and exclusive couple watches.
         </p>
         <div class="hero-buttons">
             <a href="pages/products.html" class="btn btn-gold">
@@ -1656,17 +1656,17 @@ document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
                         <span class="footer-logo-text"> STOREIFY WATCHES</span>
                     </div>
                     <p class="footer-description">
-                        Your destination for premium perfumes, luxury watches, designer sunglasses, and exclusive lifestyle accessories in Pune.
+                        Your destination for premium watches, designer sunglasses, and exclusive couple watches in Pune.
                     </p>
                     <div class="social-links">
-                        <a href="#" class="social-link" aria-label="Instagram">
+                        <a href="https://www.instagram.com/storeify.watches?igsh=MTJ6bXgzNzRwdGdkag==" class="social-link" aria-label="Instagram">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                                 <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                                 <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
                             </svg>
                         </a>
-                        <a href="#" class="social-link" aria-label="Facebook">
+                        <a href="https://www.facebook.com/share/1EU6x2EHDr/?mibextid=wwXIfr" class="social-link" aria-label="Facebook">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
                             </svg>
@@ -1693,8 +1693,7 @@ document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
                     <h4>Categories</h4>
                     <ul>
                         <li><a href="pages/products.html?category=sunglasses">Sunglasses</a></li>
-                        <li><a href="pages/products.html?category=couple-accessories">Couple Accessories</a></li>
-                        <li><a href="pages/products.html?category=lifestyle">Lifestyle</a></li>
+                        <li><a href="pages/products.html?category=couple-accessories">Couple Watches</a></li>
                         <li><a href="pages/products.html?featured=true">Featured</a></li>
                     </ul>
                 </div>
@@ -1733,7 +1732,7 @@ document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
     
     <div class="footer-bottom">
         <div class="container">
-            <p>&copy; 2024 Zara Perfume. All rights reserved.</p>
+            <p>&copy; 2024 STOREIFY WATCHES. All rights reserved.</p>
         </div>
     </div>
 </footer>
@@ -2019,9 +2018,8 @@ document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
                 'watches': 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=600&q=80',
                 'mens-watches': 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=600&q=80',
                 'female-watches': 'https://images.unsplash.com/photo-1434056886845-dac89ffe9b56?w=600&q=80',
-                'unisex-watches': 'https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?w=600&q=80',
-                'perfumes': 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=600&q=80',
-                'sunglasses': 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&q=80',
+                'unisex-watches': 'unisex.jpeg',
+                                'sunglasses': 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&q=80',
                 'couple-accessories': 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&q=80',
                 'lifestyle': 'https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=600&q=80'
             };
@@ -2137,7 +2135,7 @@ document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
                         <p class="product-description">${product.description || 'Premium quality product'}</p>
                         <div class="product-price">
                             <span class="price-current">₹${product.price.toLocaleString()}</span>
-                            ${hasDiscount ? `<span class="price-original">₹${product.original_price.toLocaleString()}</span>` : ''}
+                            ${hasDiscount ? `<span class="price-original">₹${product.original_price.toLocaleString()}</span><span class="discount-percent-text">-${discountPercent}% OFF</span>` : ''}
                         </div>
                         <button class="btn btn-add-cart" onclick="addToCart('${product.id}')">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

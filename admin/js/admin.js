@@ -181,9 +181,7 @@ async function loadCategoryDistribution(forceRefresh = false) {
             'female-watches': 'Female Watches',
             'unisex-watches': 'Unisex Watches',
             'sunglasses': 'Sunglasses',
-            'perfumes': 'Perfumes',
-            'couple-accessories': 'Couple Accessories',
-            'lifestyle': 'Lifestyle'
+            'couple-accessories': 'Couple Watches'
         };
         
         container.innerHTML = Object.entries(counts)

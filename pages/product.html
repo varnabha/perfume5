@@ -47,15 +47,14 @@
     <nav class="navbar">
         <div class="container">
             <a href="../index.html" class="logo">
-                <div class="logo-icon">⌚</div>
-                <span>Storeify</span>
+                <img src="../logo2.jpeg" alt="Storeify Logo" class="logo-icon" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%; background: transparent; box-shadow: none;">
             </a>
             
             <ul class="nav-links">
                 <li><a href="../index.html">Home</a></li>
                 <li><a href="products.html">Products</a></li>
-                <li><a href="products.html?category=watches">Watches</a></li>
-                <li><a href="products.html?category=perfumes">Perfumes</a></li>
+                <li><a href="products.html?category=mens-watches">Men's Watches</a></li>
+                <li><a href="products.html?category=sunglasses">Sunglasses</a></li>
                 <li><a href="../index.html#footer">Contact</a></li>
             </ul>
             
@@ -107,8 +106,8 @@
                     <h3>Storeify Watches</h3>
                     <p>Your destination for premium lifestyle accessories.</p>
                     <div class="social-links">
-                        <a href="https://instagram.com" target="_blank">📷</a>
-                        <a href="https://facebook.com" target="_blank">📘</a>
+                        <a href="https://www.instagram.com/storeify.watches?igsh=MTJ6bXgzNzRwdGdkag==" target="_blank">📷</a>
+                        <a href="https://www.facebook.com/share/1EU6x2EHDr/?mibextid=wwXIfr" target="_blank">📘</a>
                         <a href="https://twitter.com" target="_blank">🐦</a>
                         <a href="https://wa.me/919689467611" target="_blank">💬</a>
                     </div>
@@ -118,8 +117,8 @@
                     <ul>
                         <li><a href="../index.html">Home</a></li>
                         <li><a href="products.html">Products</a></li>
-                        <li><a href="products.html?category=watches">Watches</a></li>
-                        <li><a href="products.html?category=perfumes">Perfumes</a></li>
+                        <li><a href="products.html?category=mens-watches">Men's Watches</a></li>
+                        <li><a href="products.html?category=sunglasses">Sunglasses</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
@@ -258,7 +257,7 @@
                         <span class="price-current">${formatPrice(finalPrice)}</span>
                         ${discount > 0 ? `
                             <span class="price-original">${formatPrice(product.main_price)}</span>
-                            <span class="discount-badge">-${discount}% OFF</span>
+                            <span class="discount-percent-text">-${discount}% OFF</span>
                         ` : ''}
                     </div>
                     
